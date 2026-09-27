@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.env
+data/educoder.db
+data/educoder.db-shm
+data/educoder.db-wal
+.streamlit/secrets.toml

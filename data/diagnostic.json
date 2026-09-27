@@ -1,0 +1,146 @@
+[
+  {
+    "id": "d01",
+    "skill": "variables_io",
+    "question": "Lệnh nào nhập một số nguyên và lưu vào biến n?",
+    "options": ["n = input()", "n = int(input())", "int = input(n)", "input(int(n))"],
+    "answer_index": 1,
+    "explanation": "input() trả về chuỗi; int(...) chuyển chuỗi hợp lệ thành số nguyên."
+  },
+  {
+    "id": "d02",
+    "skill": "variables_io",
+    "question": "Giá trị của biểu thức 17 // 5 là bao nhiêu?",
+    "options": ["2", "3", "3.4", "4"],
+    "answer_index": 1,
+    "explanation": "// là phép chia lấy phần nguyên."
+  },
+  {
+    "id": "d03",
+    "skill": "variables_io",
+    "question": "Kết quả của str(10) + '5' là gì?",
+    "options": ["15", "105", "'15'", "Lỗi"],
+    "answer_index": 1,
+    "explanation": "str(10) là chuỗi '10', ghép với '5' được '105'."
+  },
+  {
+    "id": "d04",
+    "skill": "conditions",
+    "question": "Câu lệnh nào kiểm tra x thuộc đoạn từ 1 đến 10?",
+    "options": ["1 <= x <= 10", "x >= 1 or x <= 10", "1 < x > 10", "x in 1..10"],
+    "answer_index": 0,
+    "explanation": "Python cho phép viết phép so sánh nối tiếp 1 <= x <= 10."
+  },
+  {
+    "id": "d05",
+    "skill": "conditions",
+    "question": "Từ khóa nào dùng cho nhánh điều kiện tiếp theo?",
+    "options": ["elseif", "else if", "elif", "then"],
+    "answer_index": 2,
+    "explanation": "Python dùng elif."
+  },
+  {
+    "id": "d06",
+    "skill": "conditions",
+    "question": "Điều kiện kiểm tra n là số chẵn là gì?",
+    "options": ["n / 2 == 0", "n % 2 == 0", "n // 2 == 0", "n % 2 == 1"],
+    "answer_index": 1,
+    "explanation": "Số chẵn có số dư khi chia 2 bằng 0."
+  },
+  {
+    "id": "d07",
+    "skill": "loops",
+    "question": "range(2, 7) tạo các giá trị nào?",
+    "options": ["2, 3, 4, 5, 6", "2, 3, 4, 5, 6, 7", "1, 2, 3, 4, 5, 6", "2, 7"],
+    "answer_index": 0,
+    "explanation": "Cận phải của range không được lấy."
+  },
+  {
+    "id": "d08",
+    "skill": "loops",
+    "question": "Trong vòng lặp while, điều gì dễ gây lặp vô hạn?",
+    "options": ["Có lệnh print", "Biến điều kiện không thay đổi", "Dùng toán tử %", "Có câu lệnh if"],
+    "answer_index": 1,
+    "explanation": "Nếu trạng thái quyết định điều kiện dừng không đổi, while có thể không kết thúc."
+  },
+  {
+    "id": "d09",
+    "skill": "loops",
+    "question": "Muốn tính tổng từ 1 đến n, biến s ban đầu thường bằng bao nhiêu?",
+    "options": ["-1", "0", "1", "n"],
+    "answer_index": 1,
+    "explanation": "0 là phần tử trung hòa của phép cộng."
+  },
+  {
+    "id": "d10",
+    "skill": "strings_lists",
+    "question": "Với a = [4, 7, 9], giá trị a[1] là gì?",
+    "options": ["4", "7", "9", "Lỗi"],
+    "answer_index": 1,
+    "explanation": "Chỉ số bắt đầu từ 0 nên a[1] là phần tử thứ hai."
+  },
+  {
+    "id": "d11",
+    "skill": "strings_lists",
+    "question": "Lệnh nào thêm x vào cuối danh sách a?",
+    "options": ["a.add(x)", "a.push(x)", "a.append(x)", "append(a, x)"],
+    "answer_index": 2,
+    "explanation": "Phương thức append thêm một phần tử vào cuối list."
+  },
+  {
+    "id": "d12",
+    "skill": "strings_lists",
+    "question": "Biểu thức 'Python'[0:2] cho kết quả nào?",
+    "options": ["Py", "Pyt", "yt", "Python"],
+    "answer_index": 0,
+    "explanation": "Slicing lấy từ chỉ số 0 đến trước chỉ số 2."
+  },
+  {
+    "id": "d13",
+    "skill": "functions",
+    "question": "Từ khóa định nghĩa hàm trong Python là gì?",
+    "options": ["function", "define", "def", "func"],
+    "answer_index": 2,
+    "explanation": "Python dùng từ khóa def."
+  },
+  {
+    "id": "d14",
+    "skill": "functions",
+    "question": "return có tác dụng chính nào?",
+    "options": ["In ra màn hình", "Kết thúc chương trình", "Trả giá trị từ hàm", "Nhập dữ liệu"],
+    "answer_index": 2,
+    "explanation": "return kết thúc lời gọi hàm hiện tại và trả giá trị cho nơi gọi."
+  },
+  {
+    "id": "d15",
+    "skill": "functions",
+    "question": "Hàm def f(x): return x * 2; f(4) trả về gì?",
+    "options": ["4", "6", "8", "44"],
+    "answer_index": 2,
+    "explanation": "Thay x = 4, kết quả 4 * 2 = 8."
+  },
+  {
+    "id": "d16",
+    "skill": "debugging",
+    "question": "Lỗi NameError thường có nghĩa gì?",
+    "options": ["Sai thụt lề", "Dùng tên chưa được định nghĩa", "Chia cho 0", "Sai chỉ số list"],
+    "answer_index": 1,
+    "explanation": "NameError xuất hiện khi Python không tìm thấy tên biến/hàm."
+  },
+  {
+    "id": "d17",
+    "skill": "debugging",
+    "question": "Vì sao cần nhiều test case?",
+    "options": ["Để code dài hơn", "Để kiểm tra nhiều tình huống và trường hợp biên", "Để thay cho thuật toán", "Để không cần đọc đề"],
+    "answer_index": 1,
+    "explanation": "Một test đơn lẻ có thể bỏ sót lỗi ở dữ liệu khác."
+  },
+  {
+    "id": "d18",
+    "skill": "debugging",
+    "question": "Khi chương trình chạy nhưng kết quả sai, bước nào hữu ích nhất?",
+    "options": ["Đổi tên file", "In giá trị trung gian và thử dữ liệu nhỏ", "Cài lại Python", "Xóa toàn bộ code"],
+    "answer_index": 1,
+    "explanation": "Theo dõi giá trị trung gian giúp xác định bước tính sai."
+  }
+]

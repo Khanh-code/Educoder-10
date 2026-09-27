@@ -1,0 +1,42 @@
+{
+  "title": "EDUCODER 10 - Python theo định hướng Tin học 10",
+  "version": "1.0",
+  "skills": [
+    {
+      "id": "variables_io",
+      "name": "Biến, kiểu dữ liệu và nhập/xuất",
+      "description": "print, input, int, float, str, phép toán và biểu thức",
+      "prerequisites": []
+    },
+    {
+      "id": "conditions",
+      "name": "Cấu trúc rẽ nhánh",
+      "description": "if, elif, else, so sánh và logic",
+      "prerequisites": ["variables_io"]
+    },
+    {
+      "id": "loops",
+      "name": "Cấu trúc lặp",
+      "description": "for, range, while, biến tích lũy và điều kiện dừng",
+      "prerequisites": ["conditions"]
+    },
+    {
+      "id": "strings_lists",
+      "name": "Xâu ký tự và danh sách",
+      "description": "index, slicing, len, append, duyệt phần tử",
+      "prerequisites": ["loops"]
+    },
+    {
+      "id": "functions",
+      "name": "Hàm và chia nhỏ chương trình",
+      "description": "def, tham số, return, phạm vi biến và tái sử dụng",
+      "prerequisites": ["strings_lists"]
+    },
+    {
+      "id": "debugging",
+      "name": "Kiểm thử và sửa lỗi",
+      "description": "đọc traceback, test case, trường hợp biên và kiểm tra kết quả",
+      "prerequisites": ["functions"]
+    }
+  ]
+}
