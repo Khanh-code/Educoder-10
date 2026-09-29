@@ -1,3 +1,4 @@
 streamlit>=1.41,<2
 pwdlib[argon2]>=0.3,<1
 openpyxl
+streamlit-ace>=0.1.1

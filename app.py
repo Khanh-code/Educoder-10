@@ -1,4 +1,5 @@
 from __future__ import annotations
+from streamlit_ace import st_ace
 
 import json
 import random
@@ -435,7 +436,27 @@ def path_page():
         choose_next_exercise()
         st.session_state.goto_practice = True
         st.toast("Đã chọn bài phù hợp. Mở mục Luyện code ở thanh bên.")
+/*hàm thêm để tự lục lề và highlight*/
+import re
 
+def extract_error_line(code: str, error_text: str) -> int | None:
+    """Tự động tìm số dòng gây lỗi từ mã nguồn hoặc thông báo lỗi."""
+    # 1. Thử parse cú pháp trực tiếp để bắt dòng lỗi chính xác nhất
+    try:
+        compile(code, "", "exec")
+    except SyntaxError as e:
+        return e.lineno
+    except Exception:
+        pass
+
+    # 2. Tìm kiếm trong chuỗi feedback / thông báo lỗi (ví dụ: line 4, dòng 4)
+    match = re.search(r"(?:line|dòng)\s+(\d+)", error_text, re.IGNORECASE)
+    if match:
+        try:
+            return int(match.group(1))
+        except ValueError:
+            pass
+    return None
 
 def practice_page():
     st.header("⌨️ Luyện code thích ứng")
@@ -452,6 +473,7 @@ def practice_page():
         if st.button("Áp dụng lựa chọn"):
             learner.current_skill = selected_skill
             learner.current_difficulty = selected_diff
+            st.session_state.last_error_line = None  # Xóa lỗi cũ
             choose_next_exercise()
             st.rerun()
 
@@ -470,21 +492,63 @@ def practice_page():
     editor_key = f"code_{exercise['id']}"
     if editor_key not in st.session_state:
         st.session_state[editor_key] = exercise["starter_code"]
+
     with left:
-        code = st.text_area("Mã Python", key=editor_key, height=330)
+        # Cấu hình highlight dòng lỗi cho Ace Editor
+        annotations = []
+        error_line = st.session_state.get("last_error_line")
+        error_msg = st.session_state.get("last_error_msg", "Phát hiện lỗi tại dòng này")
+
+        if error_line is not None and error_line > 0:
+            annotations.append({
+                "row": error_line - 1,  # Ace Editor tính chỉ số dòng từ 0
+                "column": 0,
+                "text": error_msg,
+                "type": "error",        # Tô đỏ dòng và hiển thị icon lỗi ở lề dòng
+            })
+
+        # Ô gõ code thông minh: Có số dòng, Auto-indent và Highlight lỗi
+        code = st_ace(
+            value=st.session_state[editor_key],
+            language="python",
+            theme="monokai",
+            keybinding="vscode",
+            font_size=15,
+            tab_size=4,
+            show_gutter=True,
+            auto_update=True,
+            annotations=annotations,
+            key=f"ace_{exercise['id']}",
+            height=340,
+        )
+        st.session_state[editor_key] = code
+
         c1, c2 = st.columns(2)
         submit = c1.button("▶ Chạy và chấm", type="primary", use_container_width=True)
         new_problem = c2.button("↻ Đổi bài cùng mức", use_container_width=True)
         if new_problem:
             learner.attempts[learner.current_skill] = learner.attempts.get(learner.current_skill, 0) + 1
+            st.session_state.last_error_line = None
             choose_next_exercise()
             st.rerun()
 
     if submit:
+        # Chấm bài thông qua EDUCODER Agent
         grade, decision = agent.submit(learner, exercise, code, st.session_state.hint_level)
         save_profile()
         st.session_state.last_grade = grade
         st.session_state.last_decision = decision
+
+        # Nếu nộp bài SAI -> Trích xuất dòng bị lỗi để tô đỏ trên editor
+        if not grade.passed:
+            err_line = extract_error_line(code, f"{grade.error_category} {grade.feedback}")
+            st.session_state.last_error_line = err_line
+            st.session_state.last_error_msg = f"{grade.error_category}: {grade.feedback}"
+        else:
+            # Nếu làm ĐÚNG -> Xóa sạch các highlight cảnh báo đỏ
+            st.session_state.last_error_line = None
+            st.session_state.last_error_msg = ""
+
         st.rerun()
 
     with right:
@@ -524,25 +588,25 @@ def practice_page():
             st.markdown("**Quyết định của Agent**")
             st.info(f"{decision['action']}: {decision['reason']}")
             st.caption(f"Tiếp theo: {skill_name(decision['next_skill'])} · độ khó {decision['next_difficulty']}/3")
-            # Nếu làm ĐÚNG -> Hiển thị Cách giải nâng cao nếu có
+
+            # Nếu làm ĐÚNG -> Hiển thị cách giải nâng cao nếu có
             if grade.passed:
-                # Kiểm tra bài tập có code nâng cao hoặc gọi LLM sinh cách giải tối ưu
                 advanced_solution = exercise.get("advanced_solution")
                 if advanced_solution:
                     with st.expander("💡 Xem cách giải nâng cao & tối ưu hơn"):
                         st.markdown(f"**Gợi ý:** {advanced_solution.get('title', 'Cách viết tối ưu hơn')}")
                         st.code(advanced_solution.get("code", ""), language="python")
                         st.info(advanced_solution.get("explanation", ""))
-            
-            # Giữ lại Agent trace cho riêng giáo viên/quản trị viên kiểm tra kỹ thuật
+
+            # Giữ lại Agent trace cho riêng giáo viên/quản trị viên
             if current_user.role in ["teacher", "admin"]:
                 with st.expander("🛠️ [Dành cho Giáo viên] Xem Agent trace"):
                     st.json(decision["trace"])
                     st.json({"mastery": learner.mastery[exercise["skill"]], "error_counts": learner.error_counts})
             if st.button("Làm bài Agent đề xuất", type="primary", use_container_width=True):
+                st.session_state.last_error_line = None
                 choose_next_exercise()
                 st.rerun()
-
 
 def progress_page():
     st.header("📊 Hồ sơ học tập")
