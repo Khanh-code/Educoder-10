@@ -267,9 +267,15 @@ def render_sidebar():
             has_tested = st.session_state.get("diagnostic_result") is not None
             if not has_tested:
                 pages = ["🧭 Test đầu vào"]
-                st.warning("⚠️ Hãy làm bài test đầu vào để mở khóa lộ trình!")
             else:
-                pages = ["🏠 Tổng quan", "🧭 Test đầu vào", "🗺️ Lộ trình", "⌨️ Luyện code", "📊 Tiến bộ", "🏫 Lớp của tôi"]
+                pages = [
+                    "🏠 Tổng quan",
+                    "🗺️ Lộ trình",
+                    "⌨️ Luyện code",
+                    "📊 Tiến bộ",
+                    "📜 Kết quả test",
+                    "🏫 Lớp của tôi",
+                ]
         elif current_user.role == "teacher":
             pages = ["👨‍🏫 Quản lý lớp", "📚 Kho bài tập"]
         else:
@@ -318,10 +324,41 @@ def home_page():
 
 
 def diagnostic_page():
+    result = st.session_state.get("diagnostic_result")
+    questions = st.session_state.get("quiz", [])
+
+    # TRƯỜNG HỢP 1: ĐÃ HOÀN THÀNH TEST (CHẾ ĐỘ XEM LẠI)
+    if result:
+        st.header("📜 Kết quả đánh giá năng lực đầu vào")
+        st.caption("Bài test đã hoàn thành. Dưới đây là phân tích chi tiết và đáp án đúng để bạn đối chiếu ôn tập.")
+
+        st.success(f"Kết quả bài test: **{result.score}/{result.total} câu đúng** — Đạt trình độ: **{result.level}**")
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Điểm số", f"{result.score}/{result.total}")
+        c2.metric("Kỹ năng cần bổ trợ", len(result.weak_skills))
+        c3.metric("Lộ trình xuất phát", skill_name(result.recommended_path[0]))
+
+        st.divider()
+        st.subheader("🔍 Chi tiết đáp án đúng & Lời giải")
+
+        for idx, q in enumerate(questions, 1):
+            with st.container(border=True):
+                st.markdown(f"**Câu {idx}. {q['question']}**")
+
+                for opt_idx, opt_text in enumerate(q["options"]):
+                    if opt_idx == q["answer_index"]:
+                        st.markdown(f"✅ **{opt_text}** *(Đáp án chính xác)*")
+                    else:
+                        st.markdown(f"⚪ {opt_text}")
+
+                st.info(f"💡 **Giải thích:** {q['explanation']}")
+        return
+
+    # TRƯỜNG HỢP 2: CHƯA LÀM TEST (HIỂN THỊ ĐỀ THI LẦN ĐẦU)
     st.header("🧭 Test trình độ đầu vào")
-    st.caption("Mỗi lần làm lại, Agent chọn ngẫu nhiên câu hỏi nhưng vẫn bảo đảm phủ các kỹ năng chính.")
-    questions = st.session_state.quiz
-    
+    st.caption("Mỗi học sinh chỉ làm bài test này 1 lần duy nhất để hệ thống phân tích và mở khóa lộ trình học phù hợp.")
+
     with st.form("diagnostic_form"):
         answers: dict[str, int | None] = {}
         for index, q in enumerate(questions, 1):
@@ -336,35 +373,20 @@ def diagnostic_page():
             )
             answers[q["id"]] = choice
             st.write("")
-        
-        submitted = st.form_submit_button("Phân tích bằng EDUCODER Agent", type="primary", use_container_width=True)
+
+        submitted = st.form_submit_button("Nộp bài & Hoàn thành đánh giá", type="primary", use_container_width=True)
 
     if submitted:
-        # Kiểm tra xem có câu nào chưa chọn đáp án không
         unanswered = [idx for idx, q in enumerate(questions, 1) if answers.get(q["id"]) is None]
         if unanswered:
-            st.warning(f"⚠️ Bạn chưa chọn đáp án cho các câu: **{', '.join(map(str, unanswered))}**. Vui lòng hoàn thành tất cả trước khi nộp bài!")
+            st.warning(f"⚠️ Bạn chưa chọn câu: **{', '.join(map(str, unanswered))}**. Hãy hoàn thành đầy đủ các câu trước khi nộp bài!")
         else:
             result = agent.evaluate_diagnostic(questions, answers)
             agent.apply_diagnostic(st.session_state.learner, result)
             save_profile()
             st.session_state.diagnostic_result = result
             st.session_state.current_exercise_id = None
-            st.success("🎉 Hoàn thành bài test! Đang mở khóa toàn bộ lộ trình...")
-            st.rerun()
-
-    result = st.session_state.diagnostic_result
-    if result:
-        st.success(f"Kết quả: **{result.score}/{result.total}** — mức **{result.level}**")
-        cols = st.columns(3)
-        cols[0].metric("Điểm", f"{result.score}/{result.total}")
-        cols[1].metric("Kỹ năng cần củng cố", len(result.weak_skills))
-        cols[2].metric("Bắt đầu từ", skill_name(result.recommended_path[0]))
-        with st.expander("Xem đáp án và giải thích"):
-            for q in questions:
-                st.markdown(f"- **{q['question']}**\n  Đáp án: {q['options'][q['answer_index']]}. {q['explanation']}")
-        if st.button("Tạo bộ câu hỏi mới"):
-            reset_diagnostic()
+            st.success("🎉 Hoàn thành bài test thành công! Hệ thống đang chuyển hướng...")
             st.rerun()
 
 def path_page():
@@ -835,7 +857,7 @@ def audit_page():
 page = render_sidebar()
 if page == "🏠 Tổng quan":
     home_page()
-elif page == "🧭 Test đầu vào":
+elif page in ["🧭 Test đầu vào", "📜 Kết quả test"]:
     diagnostic_page()
 elif page == "🗺️ Lộ trình":
     path_page()
