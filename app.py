@@ -494,20 +494,43 @@ def practice_page():
         st.session_state[editor_key] = exercise["starter_code"]
 
     with left:
-        # Cấu hình highlight dòng lỗi cho Ace Editor
-        annotations = []
-        error_line = st.session_state.get("last_error_line")
-        error_msg = st.session_state.get("last_error_msg", "Phát hiện lỗi tại dòng này")
+        # 1. Thêm CSS để tô màu nền đỏ nhạt cho toàn bộ dòng bị lỗi
+        st.markdown(
+            """
+            
+            """,
+            unsafe_allow_html=True,
+        )
 
+        annotations = []
+        markers = []
+        error_line = st.session_state.get("last_error_line")
+        error_msg = st.session_state.get("last_error_msg", "Dòng này có lỗi cú pháp hoặc thực thi")
+
+        # 2. Nếu có dòng lỗi: vừa gắn icon X ở cột số dòng, vừa tô màu nền cả dòng đó
         if error_line is not None and error_line > 0:
+            row_idx = error_line - 1  # Ace Editor đếm dòng từ 0
+            
+            # Icon cảnh báo đỏ ở lề
             annotations.append({
-                "row": error_line - 1,  # Ace Editor tính chỉ số dòng từ 0
+                "row": row_idx,
                 "column": 0,
                 "text": error_msg,
-                "type": "error",        # Tô đỏ dòng và hiển thị icon lỗi ở lề dòng
+                "type": "error",
+            })
+            
+            # Tô màu nền nguyên dòng đó (từ ký tự 0 đến hết dòng)
+            markers.append({
+                "startRow": row_idx,
+                "startCol": 0,
+                "endRow": row_idx,
+                "endCol": 200,
+                "className": "ace-error-marker",
+                "type": "fullLine",
+                "inFront": True,
             })
 
-        # Ô gõ code thông minh: Có số dòng, Auto-indent và Highlight lỗi
+        # 3. Khung soạn thảo Ace Editor
         code = st_ace(
             value=st.session_state[editor_key],
             language="python",
@@ -518,6 +541,7 @@ def practice_page():
             show_gutter=True,
             auto_update=True,
             annotations=annotations,
+            markers=markers,  # <-- Truyền markers vào đây để highlight
             key=f"ace_{exercise['id']}",
             height=340,
         )
@@ -533,22 +557,19 @@ def practice_page():
             st.rerun()
 
     if submit:
-        # Chấm bài thông qua EDUCODER Agent
+        # Kiểm tra nhanh cú pháp để lấy đúng dòng lỗi ngay khi bấm
+        try:
+            compile(code, "", "exec")
+            st.session_state.last_error_line = None
+            st.session_state.last_error_msg = ""
+        except SyntaxError as e:
+            st.session_state.last_error_line = e.lineno
+            st.session_state.last_error_msg = e.msg or "Lỗi cú pháp tại dòng này"
+
         grade, decision = agent.submit(learner, exercise, code, st.session_state.hint_level)
         save_profile()
         st.session_state.last_grade = grade
         st.session_state.last_decision = decision
-
-        # Nếu nộp bài SAI -> Trích xuất dòng bị lỗi để tô đỏ trên editor
-        if not grade.passed:
-            err_line = extract_error_line(code, f"{grade.error_category} {grade.feedback}")
-            st.session_state.last_error_line = err_line
-            st.session_state.last_error_msg = f"{grade.error_category}: {grade.feedback}"
-        else:
-            # Nếu làm ĐÚNG -> Xóa sạch các highlight cảnh báo đỏ
-            st.session_state.last_error_line = None
-            st.session_state.last_error_msg = ""
-
         st.rerun()
 
     with right:
