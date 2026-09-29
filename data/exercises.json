@@ -6,7 +6,7 @@
     "kind": "io",
     "title": "Diện tích hình chữ nhật",
     "description": "Nhập chiều dài a và chiều rộng b (số nguyên). In diện tích a*b.",
-    "starter_code": "a, b = map(int, input().split())\n# Viết lệnh tính và in diện tích\n",
+    "starter_code": "a = int(input())\nb = int(input())\n# Viết lệnh tính và in diện tích\n",
     "tests": [{"input": "5 3\n", "output": "15"}, {"input": "10 7\n", "output": "70"}, {"input": "1 1\n", "output": "1"}],
     "hints": ["Công thức diện tích là chiều dài nhân chiều rộng.", "Tạo biến s = a * b rồi print(s).", "Dòng cần bổ sung có dạng: s = ... sau đó print(...)."]
   },
@@ -28,7 +28,7 @@
     "kind": "io",
     "title": "Điểm trung bình ba môn",
     "description": "Nhập ba điểm thực trên một dòng. In trung bình làm tròn 2 chữ số thập phân.",
-    "starter_code": "a, b, c = map(float, input().split())\n# Tính và in trung bình\n",
+    "starter_code": "a = float(input())\nb = float(input())\nc = float(input())\n# Viết lệnh tính và in trung bình\n",
     "tests": [{"input": "8 7 9\n", "output": "8.0"}, {"input": "6.5 7.5 8\n", "output": "7.33"}, {"input": "10 10 9\n", "output": "9.67"}],
     "hints": ["Trung bình bằng tổng chia 3.", "Dùng round(gia_tri, 2).", "print(round((a + b + c) / 3, 2))."]
   },
@@ -39,7 +39,7 @@
     "kind": "io",
     "title": "Tính tiền sau giảm giá",
     "description": "Nhập giá gốc và phần trăm giảm (đều là số). In số tiền còn lại, làm tròn 2 chữ số.",
-    "starter_code": "price, discount = map(float, input().split())\n# Tính tiền phải trả\n",
+    "starter_code": "price = float(input())\ndiscount = float(input ())\n# Tính tiền phải trả\n",
     "tests": [{"input": "100000 20\n", "output": "80000.0"}, {"input": "25000 10\n", "output": "22500.0"}, {"input": "99999 15\n", "output": "84999.15"}],
     "hints": ["Số tiền giảm = giá * phần trăm / 100.", "Tiền còn lại = giá * (1 - phần trăm/100).", "Dùng round(..., 2) trước khi in."]
   },
@@ -73,7 +73,7 @@
     "kind": "io",
     "title": "Ba cạnh có tạo thành tam giác?",
     "description": "Nhập ba số dương a b c. In YES nếu thỏa ba bất đẳng thức tam giác, ngược lại NO.",
-    "starter_code": "a, b, c = map(float, input().split())\n# Kiểm tra điều kiện tam giác\n",
+    "starter_code": "a = float(input())\nb = float(input())\nc = float(input  ())\n# Kiểm tra điều kiện tam giác\n",
     "tests": [{"input": "3 4 5\n", "output": "YES"}, {"input": "1 2 3\n", "output": "NO"}, {"input": "5 5 8\n", "output": "YES"}],
     "hints": ["Tổng hai cạnh bất kỳ phải lớn hơn cạnh còn lại.", "Ghép ba điều kiện bằng and.", "Kiểm tra a+b>c, a+c>b và b+c>a."]
   },
