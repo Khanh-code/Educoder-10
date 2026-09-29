@@ -84,12 +84,10 @@ class PasswordHasher:
             return False
 
     @staticmethod
-    def _validate_password(password: str) -> None:
-    # Cho phép mật khẩu từ 6 ký tự trở lên, không bắt buộc cả chữ lẫn số
-    if len(password) < 6:
-        raise AuthError("Mật khẩu phải có ít nhất 6 ký tự.")
-
-
+    def validate(password: str) -> None:
+        # Demo: cho phép mật khẩu từ 6 ký tự
+        if len(password) < 6:
+            raise ValidationError("Mật khẩu phải có ít nhất 6 ký tự.")
 class AuthService:
     def __init__(self, db_path: str | Path):
         self.db_path = str(db_path)
