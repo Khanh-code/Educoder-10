@@ -670,19 +670,19 @@ def progress_page():
     )
     upload = c2.file_uploader("Khôi phục hồ sơ JSON", type=["json"])
     if upload is not None:
-    try:
-        st.session_state.learner = LearnerState.from_dict(json.load(upload))
-        st.session_state.learner.learner_name = current_user.full_name
+        try:
+            st.session_state.learner = LearnerState.from_dict(json.load(upload))
+            st.session_state.learner.learner_name = current_user.full_name
 
-        # --- ĐỒNG BỘ TRẠNG THÁI TEST ĐẦU VÀO TỪ FILE KHÔI PHỤC ---
-        learner = st.session_state.learner
-        if getattr(learner, "diagnostic_done", False) or getattr(learner, "diagnostic_result", None) is not None:
-            st.session_state.diagnostic_result = getattr(learner, "diagnostic_result", None)
-            st.session_state.diagnostic_answers = getattr(learner, "diagnostic_answers", {})
-        # -------------------------------------------------------------
+            # --- ĐỒNG BỘ TRẠNG THÁI TEST ĐẦU VÀO TỪ FILE KHÔI PHỤC ---
+            learner = st.session_state.learner
+            if getattr(learner, "diagnostic_done", False) or getattr(learner, "diagnostic_result", None) is not None:
+                st.session_state.diagnostic_result = getattr(learner, "diagnostic_result", None)
+                st.session_state.diagnostic_answers = getattr(learner, "diagnostic_answers", {})
+            # -------------------------------------------------------------
 
-        save_profile()
-        st.success("Đã khôi phục hồ sơ.")
+            save_profile()
+            st.success("Đã khôi phục hồ sơ.")
     except (ValueError, TypeError, json.JSONDecodeError) as exc:
         st.error(f"File không hợp lệ: {exc}")
 
