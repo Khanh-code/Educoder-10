@@ -5,25 +5,12 @@ import random
 from dataclasses import asdict
 from pathlib import Path
 
-import pandas as pd
 import streamlit as st
+import pandas as pd
 
-from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
-from educoder_core import (
-    ContentRepository,
-    EDUCODERAgent,
-    LearnerState,
-    load_mbpp_preview,
-    pretty_json,
-)
+import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
-st.set_page_config(
-    page_title="EDUCODER 10",
-    page_icon="🐍",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+import pandas as pd
 
 def auto_seed_data():
     """Tự động khởi tạo Admin, Giáo viên, 40 học sinh từ Excel và gán vào lớp học."""
@@ -97,6 +84,25 @@ def auto_seed_data():
                         
         except Exception as e:
             print("Lỗi nạp danh sách tự động từ Excel:", e)
+
+from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
+from educoder_core import (
+    ContentRepository,
+    EDUCODERAgent,
+    LearnerState,
+    load_mbpp_preview,
+    pretty_json,
+)
+
+ROOT = Path(__file__).resolve().parent
+
+
+st.set_page_config(
+    page_title="EDUCODER 10",
+    page_icon="🐍",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 st.markdown(
     """
