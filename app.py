@@ -657,6 +657,7 @@ def progress_page():
     if learner.error_counts:
         st.subheader("Lỗi thường gặp")
         st.bar_chart(learner.error_counts)
+
     with st.expander("Nhật ký quyết định"):
         st.json(learner.history[-20:])
 
@@ -683,9 +684,8 @@ def progress_page():
 
             save_profile()
             st.success("Đã khôi phục hồ sơ.")
-    except (ValueError, TypeError, json.JSONDecodeError) as exc:
-        st.error(f"File không hợp lệ: {exc}")
-
+        except (ValueError, TypeError, json.JSONDecodeError) as exc:
+            st.error(f"File không hợp lệ: {exc}")
 
 def exercise_bank_page():
     st.header("📚 Kho bài tập")
