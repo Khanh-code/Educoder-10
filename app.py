@@ -10,38 +10,81 @@ import pandas as pd
 
 import pandas as pd
 
+import pandas as pd
+
 def auto_seed_data():
-    """Tự động khởi tạo Admin, Giáo viên và 40 học sinh nếu hệ thống trống."""
-    # 1. Tạo Admin mặc định nếu chưa có
+    """Tự động khởi tạo Admin, Giáo viên, 40 học sinh từ Excel và gán vào lớp học."""
+    # 1. Khởi tạo Admin nếu hệ thống chưa có người dùng
     if not auth.has_users():
         admin = auth.bootstrap_admin("admin", "Quản trị viên EDUCODER", "123456")
     else:
         admin = auth.get_user(1)
 
-    # 2. Tạo sẵn 1 tài khoản Giáo viên mẫu (nếu chưa có)
-    existing_users = {u["username"] for u in auth.list_users(admin.id)}
+    # 2. Khởi tạo Giáo viên mẫu phụ trách lớp
+    teacher = None
+    existing_users = {u["username"]: u for u in auth.list_users(admin.id)}
+    
     if "giaovien_tin" not in existing_users:
         try:
-            auth.create_user(admin.id, "giaovien_tin", "Thầy Cô Tin Học", "teacher", "123456")
+            teacher = auth.create_user(admin.id, "giaovien_tin", "Thầy Cô Tin Học", "teacher", "123456")
+            existing_users["giaovien_tin"] = {"id": teacher.id, "username": "giaovien_tin"}
         except Exception:
             pass
+    else:
+        teacher_id = existing_users["giaovien_tin"]["id"]
+        teacher = auth.get_user(teacher_id)
 
-    # 3. Đọc file Excel 40 học sinh (.xlsx)
+    # 3. Tạo lớp học mặc định do Giáo viên phụ trách (nếu chưa có lớp)
+    classes = auth.list_classes(admin.id)
+    target_class = None
+    
+    if classes:
+        target_class = classes[0]
+    elif teacher:
+        try:
+            target_class = auth.create_class(teacher.id, "10A1 - Tin học 10")
+        except Exception as e:
+            print("Lỗi tạo lớp học mặc định:", e)
+
+    # 4. Đọc file Excel 40 học sinh, tạo tài khoản và tự động thêm vào lớp
     excel_path = ROOT / "data" / "danh_sach_10a1.xlsx"
     if excel_path.exists():
         try:
             df = pd.read_excel(excel_path)
+            
+            # Lấy danh sách ID học sinh đã có sẵn trong lớp để tránh thêm trùng
+            existing_class_student_ids = set()
+            if target_class:
+                class_students = auth.class_students(admin.id, target_class["id"])
+                existing_class_student_ids = {s["id"] for s in class_students}
+
             for _, row in df.iterrows():
                 u_name = str(row["username"]).strip()
                 f_name = str(row["full_name"]).strip()
+                
+                # Tạo tài khoản học sinh nếu chưa tồn tại
+                student_id = None
                 if u_name not in existing_users:
                     try:
-                        auth.create_user(admin.id, u_name, f_name, "student", "123456")
-                        existing_users.add(u_name)
+                        student_obj = auth.create_user(admin.id, u_name, f_name, "student", "123456")
+                        student_id = student_obj.id
+                        existing_users[u_name] = {"id": student_id, "username": u_name}
                     except Exception:
                         pass
+                else:
+                    student_id = existing_users[u_name]["id"]
+
+                # Tự động gán học sinh vào lớp học
+                if target_class and student_id and (student_id not in existing_class_student_ids):
+                    try:
+                        auth.join_class(student_id, target_class["join_code"])
+                        existing_class_student_ids.add(student_id)
+                    except Exception:
+                        pass
+                        
         except Exception as e:
             print("Lỗi nạp danh sách tự động từ Excel:", e)
+            
 from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
 from educoder_core import (
     ContentRepository,
