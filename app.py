@@ -182,20 +182,25 @@ def render_sidebar():
     with st.sidebar:
         st.title("EDUCODER 10")
         st.write(f"**{current_user.full_name}**")
-        st.caption(f"{ROLE_LABELS[current_user.role]} · @{current_user.username}")
+        st.caption(f"{ROLE_LABELS.get(current_user.role, current_user.role)} · @{current_user.username}")
+        
+        # 1. PHÂN QUYỀN TRANG THEO VAI TRÒ (Đảm bảo luôn gán giá trị cho pages)
         if current_user.role == "student":
-            # Kiểm tra xem học sinh đã có kết quả test đầu vào chưa
             has_tested = st.session_state.get("diagnostic_result") is not None
-            
             if not has_tested:
-                # Nếu CHƯA làm bài test: Ép buộc chỉ hiển thị và mở trang Test đầu vào
                 pages = ["🧭 Test đầu vào"]
-                st.warning("⚠️ Hãy hoàn thành bài kiểm tra năng lực để kích hoạt lộ trình học tập!")
+                st.warning("⚠️ Hãy làm bài test đầu vào để mở khóa lộ trình!")
             else:
-                # Nếu ĐÃ LÀM XONG: Mở khóa toàn bộ chức năng
                 pages = ["🏠 Tổng quan", "🧭 Test đầu vào", "🗺️ Lộ trình", "⌨️ Luyện code", "📊 Tiến bộ", "🏫 Lớp của tôi"]
+        elif current_user.role == "teacher":
+            pages = ["👨‍🏫 Quản lý lớp", "📚 Kho bài tập"]
+        else:
+            # Nhánh dành cho ADMIN (hoặc bất kỳ role nào khác)
+            pages = ["🛡️ Quản trị tài khoản", "🏫 Toàn bộ lớp", "🧾 Nhật ký hệ thống"]
+            
         page = st.radio("Điều hướng", pages)
         st.divider()
+        
         if current_user.role == "student":
             learner: LearnerState = st.session_state.learner
             current = learner.current_skill
@@ -203,12 +208,13 @@ def render_sidebar():
             st.write(f"**{skill_name(current)}**")
             st.progress(float(learner.mastery.get(current, 0.0)))
             st.caption(f"Thành thạo: {learner.mastery.get(current, 0.0)*100:.0f}% · độ khó {learner.current_difficulty}/3")
+            
         if st.button("Đăng xuất", use_container_width=True):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
+            
         return page
-
 
 def home_page():
     render_header()
