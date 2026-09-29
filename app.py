@@ -84,7 +84,7 @@ def auto_seed_data():
                         
         except Exception as e:
             print("Lỗi nạp danh sách tự động từ Excel:", e)
-            
+
 from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
 from educoder_core import (
     ContentRepository,
@@ -131,7 +131,6 @@ repo, agent, auth = services()
 
 def auth_gate():
     auto_seed_data()
-    """Khởi tạo admin lần đầu hoặc yêu cầu đăng nhập."""
     if not auth.has_users():
         st.title("🐍 EDUCODER 10")
         st.warning("Hệ thống chưa có tài khoản. Hãy tạo quản trị viên đầu tiên trên máy chủ tin cậy.")
