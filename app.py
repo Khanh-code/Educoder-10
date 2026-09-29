@@ -204,6 +204,12 @@ def init_state():
         stored = auth.load_profile(current_user.id, current_user.id)
         st.session_state.learner = LearnerState.from_dict(stored) if stored else agent.new_state(current_user.full_name)
         st.session_state.learner_user_id = current_user.id
+
+        # --- KHÔI PHỤC KẾT QUẢ TEST ĐẦU VÀO ĐỂ KHÔNG BẮT LÀM LẠI ---
+        learner = st.session_state.learner
+        if getattr(learner, "diagnostic_done", False) or getattr(learner, "diagnostic_result", None) is not None:
+            st.session_state.diagnostic_result = getattr(learner, "diagnostic_result", None)
+            st.session_state.diagnostic_answers = getattr(learner, "diagnostic_answers", {})
     if "quiz" not in st.session_state:
         st.session_state.quiz = repo.diagnostic_sample(10, seed=random.randint(1, 10_000_000))
     if "diagnostic_result" not in st.session_state:
@@ -409,12 +415,18 @@ def diagnostic_page():
             result = agent.evaluate_diagnostic(questions, answers)
             agent.apply_diagnostic(st.session_state.learner, result)
             
-            # Lưu lại cả đáp án học sinh đã chọn để xem lại sau này
-            st.session_state.diagnostic_answers = answers
-            st.session_state.diagnostic_result = result
-            st.session_state.current_exercise_id = None
-            save_profile()
+            # --- LƯU TRỰC TIẾP VÀO HỒ SƠ HỌC SINH ĐỂ LƯU VĨNH VIỄN ---
+            st.session_state.learner.diagnostic_done = True
+            st.session_state.learner.diagnostic_result = result
+            st.session_state.learner.diagnostic_answers = answers
             
+            # Lưu session_state hiện tại
+            st.session_state.diagnostic_result = result
+            st.session_state.diagnostic_answers = answers
+            st.session_state.current_exercise_id = None
+            
+            # Ghi xuống database / file profile
+            save_profile()
             st.success("🎉 Hoàn thành bài test thành công!")
             st.rerun()
 
@@ -658,13 +670,21 @@ def progress_page():
     )
     upload = c2.file_uploader("Khôi phục hồ sơ JSON", type=["json"])
     if upload is not None:
-        try:
-            st.session_state.learner = LearnerState.from_dict(json.load(upload))
-            st.session_state.learner.learner_name = current_user.full_name
-            save_profile()
-            st.success("Đã khôi phục hồ sơ.")
-        except (ValueError, TypeError, json.JSONDecodeError) as exc:
-            st.error(f"File không hợp lệ: {exc}")
+    try:
+        st.session_state.learner = LearnerState.from_dict(json.load(upload))
+        st.session_state.learner.learner_name = current_user.full_name
+
+        # --- ĐỒNG BỘ TRẠNG THÁI TEST ĐẦU VÀO TỪ FILE KHÔI PHỤC ---
+        learner = st.session_state.learner
+        if getattr(learner, "diagnostic_done", False) or getattr(learner, "diagnostic_result", None) is not None:
+            st.session_state.diagnostic_result = getattr(learner, "diagnostic_result", None)
+            st.session_state.diagnostic_answers = getattr(learner, "diagnostic_answers", {})
+        # -------------------------------------------------------------
+
+        save_profile()
+        st.success("Đã khôi phục hồ sơ.")
+    except (ValueError, TypeError, json.JSONDecodeError) as exc:
+        st.error(f"File không hợp lệ: {exc}")
 
 
 def exercise_bank_page():

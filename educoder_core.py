@@ -65,6 +65,9 @@ class GradeResult:
     run_details: list[RunResult] = field(default_factory=list)
 
 
+from dataclasses import dataclass, asdict, field
+from typing import Any
+
 @dataclass
 class LearnerState:
     learner_name: str = "Học sinh"
@@ -77,6 +80,11 @@ class LearnerState:
     current_difficulty: int = 1
     history: list[dict[str, Any]] = field(default_factory=list)
 
+    # --- THÊM 3 TRƯỜNG ĐỂ LƯU KẾT QUẢ TEST ĐẦU VÀO VĨNH VIỄN ---
+    diagnostic_done: bool = False
+    diagnostic_result: Any = None
+    diagnostic_answers: dict[str, Any] = field(default_factory=dict)
+
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
@@ -84,7 +92,6 @@ class LearnerState:
     def from_dict(cls, payload: dict[str, Any]) -> "LearnerState":
         allowed = {f.name for f in cls.__dataclass_fields__.values()}
         return cls(**{k: v for k, v in payload.items() if k in allowed})
-
 
 class ContentRepository:
     def __init__(self, data_dir: Path = DATA_DIR):
