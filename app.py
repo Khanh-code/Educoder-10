@@ -184,11 +184,16 @@ def render_sidebar():
         st.write(f"**{current_user.full_name}**")
         st.caption(f"{ROLE_LABELS[current_user.role]} · @{current_user.username}")
         if current_user.role == "student":
-            pages = ["🏠 Tổng quan", "🧭 Test đầu vào", "🗺️ Lộ trình", "⌨️ Luyện code", "📊 Tiến bộ", "🏫 Lớp của tôi"]
-        elif current_user.role == "teacher":
-            pages = ["👨‍🏫 Quản lý lớp", "📚 Kho bài tập"]
-        else:
-            pages = ["🛡️ Quản trị tài khoản", "🏫 Toàn bộ lớp", "🧾 Nhật ký hệ thống"]
+            # Kiểm tra xem học sinh đã có kết quả test đầu vào chưa
+            has_tested = st.session_state.get("diagnostic_result") is not None
+            
+            if not has_tested:
+                # Nếu CHƯA làm bài test: Ép buộc chỉ hiển thị và mở trang Test đầu vào
+                pages = ["🧭 Test đầu vào"]
+                st.warning("⚠️ Hãy hoàn thành bài kiểm tra năng lực để kích hoạt lộ trình học tập!")
+            else:
+                # Nếu ĐÃ LÀM XONG: Mở khóa toàn bộ chức năng
+                pages = ["🏠 Tổng quan", "🧭 Test đầu vào", "🗺️ Lộ trình", "⌨️ Luyện code", "📊 Tiến bộ", "🏫 Lớp của tôi"]
         page = st.radio("Điều hướng", pages)
         st.divider()
         if current_user.role == "student":
@@ -252,6 +257,7 @@ def diagnostic_page():
         save_profile()
         st.session_state.diagnostic_result = result
         st.session_state.current_exercise_id = None
+        st.success("🎉 Hoàn thành bài test! Đang mở khóa toàn bộ lộ trình...")
         st.rerun()
 
     result = st.session_state.diagnostic_result
@@ -376,9 +382,21 @@ def practice_page():
             st.markdown("**Quyết định của Agent**")
             st.info(f"{decision['action']}: {decision['reason']}")
             st.caption(f"Tiếp theo: {skill_name(decision['next_skill'])} · độ khó {decision['next_difficulty']}/3")
-            with st.expander("Xem Agent trace"):
-                st.json(decision["trace"])
-                st.json({"mastery": learner.mastery[exercise["skill"]], "error_counts": learner.error_counts})
+            # Nếu làm ĐÚNG -> Hiển thị Cách giải nâng cao nếu có
+            if grade.passed:
+                # Kiểm tra bài tập có code nâng cao hoặc gọi LLM sinh cách giải tối ưu
+                advanced_solution = exercise.get("advanced_solution")
+                if advanced_solution:
+                    with st.expander("💡 Xem cách giải nâng cao & tối ưu hơn"):
+                        st.markdown(f"**Gợi ý:** {advanced_solution.get('title', 'Cách viết tối ưu hơn')}")
+                        st.code(advanced_solution.get("code", ""), language="python")
+                        st.info(advanced_solution.get("explanation", ""))
+            
+            # Giữ lại Agent trace cho riêng giáo viên/quản trị viên kiểm tra kỹ thuật
+            if current_user.role in ["teacher", "admin"]:
+                with st.expander("🛠️ [Dành cho Giáo viên] Xem Agent trace"):
+                    st.json(decision["trace"])
+                    st.json({"mastery": learner.mastery[exercise["skill"]], "error_counts": learner.error_counts})
             if st.button("Làm bài Agent đề xuất", type="primary", use_container_width=True):
                 choose_next_exercise()
                 st.rerun()
@@ -482,7 +500,7 @@ def teacher_classes_page():
 
 def admin_users_page():
     st.header("🛡️ Quản trị tài khoản và phân quyền")
-    tab1, tab2, tab3 = st.tabs(["Tạo tài khoản", "Danh sách & vai trò", "Đặt lại mật khẩu"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Tạo tài khoản", "📥 Nạp danh sách (Excel/CSV)", "Danh sách & vai trò", "Đặt lại mật khẩu"])
     with tab1:
         suggested = st.session_state.get("suggested_password", generate_temporary_password())
         with st.form("create_user"):
@@ -500,6 +518,55 @@ def admin_users_page():
                 st.error(str(exc))
     users = auth.list_users(current_user.id)
     with tab2:
+        st.subheader("Nạp hàng loạt tài khoản học sinh")
+        st.caption("Tải file danh sách lớp (.csv hoặc .xlsx). Mật khẩu mặc định sẽ là: **123456**")
+
+        import pandas as pd
+        
+        # Tạo file CSV mẫu cho Admin tải về
+        sample_df = pd.DataFrame({
+            "username": ["10a1_01", "10a1_02", "10a1_03"],
+            "full_name": ["Nguyễn Văn An", "Trần Thị Bình", "Lê Hoàng Cường"]
+        })
+        st.download_button(
+            "📥 Tải file mẫu CSV",
+            data=sample_df.to_csv(index=False).encode("utf-8"),
+            file_name="mau_danh_sach_10a1.csv",
+            mime="text/csv"
+        )
+        
+        uploaded_file = st.file_uploader("Chọn file danh sách học sinh", type=["csv", "xlsx"])
+        if uploaded_file is not None:
+            try:
+                if uploaded_file.name.endswith(".csv"):
+                    df = pd.read_csv(uploaded_file)
+                else:
+                    df = pd.read_excel(uploaded_file)
+                
+                st.write("Xem trước danh sách:")
+                st.dataframe(df.head(), use_container_width=True)
+                
+                if st.button("Xác nhận nạp tài khoản vào hệ thống", type="primary"):
+                    if "username" not in df.columns or "full_name" not in df.columns:
+                        st.error("File cần có ít nhất 2 cột: 'username' và 'full_name'")
+                    else:
+                        success_count = 0
+                        duplicate_count = 0
+                        for _, row in df.iterrows():
+                            u_name = str(row["username"]).strip()
+                            f_name = str(row["full_name"]).strip()
+                            default_pwd = "123456" # Mật khẩu theo yêu cầu đề bài
+                            try:
+                                auth.create_user(current_user.id, u_name, f_name, "student", default_pwd)
+                                success_count += 1
+                            except AuthError:
+                                duplicate_count += 1
+                        
+                        st.success(f" Đã tạo thành công {success_count} học sinh! (Bỏ qua {duplicate_count} tài khoản đã tồn tại).")
+                        st.rerun()
+            except Exception as exc:
+                st.error(f"Lỗi khi đọc file: {exc}")
+    with tab3:
         st.dataframe([{"ID": x["id"], "Tài khoản": x["username"], "Họ tên": x["full_name"], "Vai trò": ROLE_LABELS[x["role"]], "Hoạt động": "Có" if x["is_active"] else "Đã khóa", "Đổi MK": "Bắt buộc" if x["must_change_password"] else "Không"} for x in users], use_container_width=True, hide_index=True)
         target = st.selectbox("Chọn tài khoản để sửa", users, format_func=lambda x: f"{x['full_name']} (@{x['username']})", key="role_target")
         c1, c2 = st.columns(2)
@@ -513,7 +580,7 @@ def admin_users_page():
                 st.rerun()
             except AuthError as exc:
                 st.error(str(exc))
-    with tab3:
+    with tab4:
         target = st.selectbox("Tài khoản", users, format_func=lambda x: f"{x['full_name']} (@{x['username']})", key="reset_target")
         temp = st.text_input("Mật khẩu tạm mới", value=generate_temporary_password())
         if st.button("Đặt lại mật khẩu"):
@@ -574,4 +641,4 @@ else:
     audit_page()
 
 st.divider()
-st.caption("EDUCODER 10 v2.0 · RBAC Admin/Giáo viên/Học sinh · Chấm bài xác định · Không chạy mã học sinh không tin cậy trên máy chủ công cộng nếu chưa có sandbox cô lập.")
+
