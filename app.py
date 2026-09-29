@@ -6,7 +6,42 @@ from dataclasses import asdict
 from pathlib import Path
 
 import streamlit as st
+import pandas as pd
 
+import pandas as pd
+
+def auto_seed_data():
+    """Tự động khởi tạo Admin, Giáo viên và 40 học sinh nếu hệ thống trống."""
+    # 1. Tạo Admin mặc định nếu chưa có
+    if not auth.has_users():
+        admin = auth.bootstrap_admin("admin", "Quản trị viên EDUCODER", "123456")
+    else:
+        admin = auth.get_user(1)
+
+    # 2. Tạo sẵn 1 tài khoản Giáo viên mẫu (nếu chưa có)
+    existing_users = {u["username"] for u in auth.list_users(admin.id)}
+    if "giaovien_tin" not in existing_users:
+        try:
+            auth.create_user(admin.id, "giaovien_tin", "Thầy Cô Tin Học", "teacher", "123456")
+        except Exception:
+            pass
+
+    # 3. Đọc file Excel 40 học sinh (.xlsx)
+    excel_path = ROOT / "data" / "danh_sach_10a1.xlsx"
+    if excel_path.exists():
+        try:
+            df = pd.read_excel(excel_path)
+            for _, row in df.iterrows():
+                u_name = str(row["username"]).strip()
+                f_name = str(row["full_name"]).strip()
+                if u_name not in existing_users:
+                    try:
+                        auth.create_user(admin.id, u_name, f_name, "student", "123456")
+                        existing_users.add(u_name)
+                    except Exception:
+                        pass
+        except Exception as e:
+            print("Lỗi nạp danh sách tự động từ Excel:", e)
 from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
 from educoder_core import (
     ContentRepository,
@@ -52,6 +87,7 @@ repo, agent, auth = services()
 
 
 def auth_gate():
+    auto_seed_data()
     """Khởi tạo admin lần đầu hoặc yêu cầu đăng nhập."""
     if not auth.has_users():
         st.title("🐍 EDUCODER 10")
@@ -602,24 +638,167 @@ def admin_users_page():
             except AuthError as exc:
                 st.error(str(exc))
 def all_classes_page():
-    st.header("🏫 Toàn bộ lớp")
+  st.header("🏫 Quản lý toàn bộ lớp học & Phân quyền")
+
+  tab_classes, tab_create, tab_add_student = st.tabs([
+      "📋 Danh sách lớp & Học sinh",
+      "➕ Tạo lớp mới",
+      "👤 Thêm học sinh vào lớp",
+  ])
+
+  # TAB 1: XEM DANH SÁCH LỚP & CHUYỂN GIÁO VIÊN
+  with tab_classes:
     classes = auth.list_classes(current_user.id)
-    st.dataframe([{"Lớp": x["name"], "Giáo viên": x["teacher_name"], "Mã": x["join_code"], "Sĩ số": x["student_count"]} for x in classes], use_container_width=True, hide_index=True)
+    st.dataframe(
+        [
+            {
+                "Lớp": x["name"],
+                "Giáo viên": x["teacher_name"],
+                "Mã tham gia": x["join_code"],
+                "Sĩ số": x["student_count"],
+            }
+            for x in classes
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+
     if classes:
-        selected = st.selectbox("Xem học sinh", classes, format_func=lambda x: x["name"])
-        st.dataframe(auth.class_students(current_user.id, selected["id"]), use_container_width=True, hide_index=True)
-        teachers = [x for x in auth.list_users(current_user.id) if x["role"] == "teacher" and x["is_active"]]
-        if teachers:
-            new_teacher = st.selectbox("Chuyển lớp cho giáo viên", teachers, format_func=lambda x: f"{x['full_name']} (@{x['username']})")
-            if st.button("Chuyển quyền phụ trách lớp"):
-                try:
-                    auth.reassign_class(current_user.id, selected["id"], new_teacher["id"])
-                    st.success("Đã chuyển lớp.")
-                    st.rerun()
-                except AuthError as exc:
-                    st.error(str(exc))
+      st.divider()
+      selected = st.selectbox(
+          "Xem chi tiết học sinh trong lớp",
+          classes,
+          format_func=lambda x: f"{x['name']} (Mã: {x['join_code']})",
+      )
+      students = auth.class_students(current_user.id, selected["id"])
+      if students:
+        st.dataframe(students, use_container_width=True, hide_index=True)
+      else:
+        st.info("Lớp này hiện chưa có học sinh nào.")
 
+      st.subheader("Phân công / Chuyển giáo viên phụ trách")
+      teachers = [
+          x
+          for x in auth.list_users(current_user.id)
+          if x["role"] == "teacher" and x["is_active"]
+      ]
+      if teachers:
+        c1, c2 = st.columns([3, 1])
+        new_teacher = c1.selectbox(
+            "Chọn giáo viên",
+            teachers,
+            format_func=lambda x: f"{x['full_name']} (@{x['username']})",
+        )
+        if c2.button("Cập nhật giáo viên", type="primary"):
+          try:
+            auth.reassign_class(
+                current_user.id, selected["id"], new_teacher["id"]
+            )
+            st.success(f"Đã phân công giáo viên cho lớp {selected['name']}.")
+            st.rerun()
+          except AuthError as exc:
+            st.error(str(exc))
+      else:
+        st.warning(
+            "Chưa có tài khoản Giáo viên nào. Hãy tạo tài khoản với vai trò"
+            " 'Giáo viên' trước."
+        )
 
+  # TAB 2: TẠO LỚP MỚI VÀ GÁN GIÁO VIÊN
+  with tab_create:
+    st.subheader("Tạo lớp học mới")
+    teachers = [
+        x
+        for x in auth.list_users(current_user.id)
+        if x["role"] == "teacher" and x["is_active"]
+    ]
+
+    with st.form("admin_create_class"):
+      class_name = st.text_input(
+          "Tên lớp", placeholder="Ví dụ: 10A1 - Tin học 10"
+      )
+      if teachers:
+        assigned_teacher = st.selectbox(
+            "Phân công giáo viên phụ trách ngay",
+            teachers,
+            format_func=lambda x: f"{x['full_name']} (@{x['username']})",
+        )
+      else:
+        st.caption(
+            "*(Hiện chưa có giáo viên, lớp sẽ được tạo dưới danh nghĩa admin"
+            " trước)*"
+        )
+        assigned_teacher = None
+
+      submitted = st.form_submit_button("Tạo lớp", type="primary")
+
+    if submitted:
+      if not class_name.strip():
+        st.error("Tên lớp không được để trống.")
+      else:
+        try:
+          # Tạo lớp
+          teacher_id = (
+              assigned_teacher["id"] if assigned_teacher else current_user.id
+          )
+          classroom = auth.create_class(teacher_id, class_name.strip())
+          st.success(
+              f"Đã tạo thành công lớp '{class_name}'! Mã tham gia:"
+              f" {classroom['join_code']}"
+          )
+          st.rerun()
+        except AuthError as exc:
+          st.error(str(exc))
+
+  # TAB 3: THÊM HỌC SINH VÀO LỚP TRỰC TIẾP
+  with tab_add_student:
+    st.subheader("Gán học sinh vào lớp học")
+    classes = auth.list_classes(current_user.id)
+    all_students = [
+        x
+        for x in auth.list_users(current_user.id)
+        if x["role"] == "student" and x["is_active"]
+    ]
+
+    if not classes:
+      st.info("Chưa có lớp nào, vui lòng tạo lớp trước.")
+    elif not all_students:
+      st.info(
+          "Chưa có tài khoản học sinh nào. Hãy vào mục 'Quản trị tài khoản' để"
+          " nạp học sinh."
+      )
+    else:
+      target_class = st.selectbox(
+          "Chọn lớp cần thêm",
+          classes,
+          format_func=lambda x: x["name"],
+          key="target_class_add",
+      )
+
+      # Cho phép chọn 1 hoặc nhiều học sinh cùng lúc
+      selected_students = st.multiselect(
+          "Chọn học sinh muốn đưa vào lớp",
+          all_students,
+          format_func=lambda x: f"{x['full_name']} (@{x['username']})",
+      )
+
+      if st.button("Xác nhận đưa vào lớp", type="primary"):
+        if not selected_students:
+          st.warning("Vui lòng chọn ít nhất một học sinh.")
+        else:
+          added_count = 0
+          for hs in selected_students:
+            try:
+              # Gán học sinh vào lớp bằng mã join_code của lớp
+              auth.join_class(hs["id"], target_class["join_code"])
+              added_count += 1
+            except AuthError:
+              pass  # Bỏ qua nếu đã ở trong lớp rồi
+          st.success(
+              f"Đã thêm thành công {added_count} học sinh vào lớp"
+              f" {target_class['name']}!"
+          )
+          st.rerun()
 def audit_page():
     st.header("🧾 Nhật ký hệ thống")
     st.caption("Theo dõi các thao tác quản trị quan trọng; nhật ký không lưu mật khẩu.")
