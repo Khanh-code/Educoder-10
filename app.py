@@ -8,9 +8,39 @@ from pathlib import Path
 import streamlit as st
 import pandas as pd
 
-import pandas as pd
+from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
+from educoder_core import (
+    ContentRepository,
+    EDUCODERAgent,
+    LearnerState,
+    load_mbpp_preview,
+    pretty_json,
+)
 
-import pandas as pd
+ROOT = Path(__file__).resolve().parent
+
+
+st.set_page_config(
+    page_title="EDUCODER 10",
+    page_icon="🐍",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+st.markdown(
+    """
+    <style>
+      .hero {padding: 1.2rem 1.4rem; border-radius: 18px;
+             background: linear-gradient(135deg,#0f4c81,#1580c5); color:white;}
+      .hero h1 {margin:0; font-size:2.15rem}.hero p{margin:.45rem 0 0;opacity:.92}
+      .agent-card {padding:1rem; border:1px solid #d9e5ee; border-radius:14px;
+                   background:#f7fbfe; margin:.5rem 0}
+      .metric-note {font-size:.86rem;color:#536471}
+      code {font-size:.92em}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 def auto_seed_data():
     """Tự động khởi tạo Admin, Giáo viên, 40 học sinh từ Excel và gán vào lớp học."""
@@ -84,40 +114,6 @@ def auto_seed_data():
                         
         except Exception as e:
             print("Lỗi nạp danh sách tự động từ Excel:", e)
-
-from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
-from educoder_core import (
-    ContentRepository,
-    EDUCODERAgent,
-    LearnerState,
-    load_mbpp_preview,
-    pretty_json,
-)
-
-ROOT = Path(__file__).resolve().parent
-
-
-st.set_page_config(
-    page_title="EDUCODER 10",
-    page_icon="🐍",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
-st.markdown(
-    """
-    <style>
-      .hero {padding: 1.2rem 1.4rem; border-radius: 18px;
-             background: linear-gradient(135deg,#0f4c81,#1580c5); color:white;}
-      .hero h1 {margin:0; font-size:2.15rem}.hero p{margin:.45rem 0 0;opacity:.92}
-      .agent-card {padding:1rem; border:1px solid #d9e5ee; border-radius:14px;
-                   background:#f7fbfe; margin:.5rem 0}
-      .metric-note {font-size:.86rem;color:#536471}
-      code {font-size:.92em}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 
 @st.cache_resource
