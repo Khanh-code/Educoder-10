@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+
 from auth import AuthError, AuthService, ROLE_LABELS, ROLES, generate_temporary_password
 from educoder_core import (
     ContentRepository,
@@ -17,7 +18,6 @@ from educoder_core import (
 )
 
 ROOT = Path(__file__).resolve().parent
-
 
 st.set_page_config(
     page_title="EDUCODER 10",
