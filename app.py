@@ -18,14 +18,12 @@ from educoder_core import (
 )
 
 ROOT = Path(__file__).resolve().parent
-
 st.set_page_config(
     page_title="EDUCODER 10",
     page_icon="🐍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
 
 def auto_seed_data():
     """Tự động khởi tạo Admin, Giáo viên, 40 học sinh từ Excel và gán vào lớp học."""
