@@ -498,9 +498,17 @@ def teacher_classes_page():
     st.dataframe([{"Học sinh": x["full_name"], "Tài khoản": x["username"], "Bài đã giải": x["solved"], "Lượt làm": x["attempts"], "Thành thạo TB": f"{x['average_mastery']}%", "Cập nhật": x["updated_at"] or "Chưa học"} for x in students], use_container_width=True, hide_index=True)
 
 
+import pandas as pd
+
 def admin_users_page():
     st.header("🛡️ Quản trị tài khoản và phân quyền")
-    tab1, tab2, tab3, tab4 = st.tabs(["Tạo tài khoản", "📥 Nạp danh sách (Excel/CSV)", "Danh sách & vai trò", "Đặt lại mật khẩu"])
+    tab1, tab_upload, tab2, tab3 = st.tabs([
+        "Tạo tài khoản", 
+        "📥 Nạp danh sách (Excel/CSV)", 
+        "Danh sách & vai trò", 
+        "Đặt lại mật khẩu"
+    ])
+    
     with tab1:
         suggested = st.session_state.get("suggested_password", generate_temporary_password())
         with st.form("create_user"):
@@ -516,14 +524,11 @@ def admin_users_page():
                 st.success(f"Đã tạo @{created.username}. Gửi mật khẩu tạm qua kênh riêng; người dùng buộc đổi ở lần đăng nhập đầu.")
             except AuthError as exc:
                 st.error(str(exc))
-    users = auth.list_users(current_user.id)
-    with tab2:
-        st.subheader("Nạp hàng loạt tài khoản học sinh")
-        st.caption("Tải file danh sách lớp (.csv hoặc .xlsx). Mật khẩu mặc định sẽ là: **123456**")
 
-        import pandas as pd
+    with tab_upload:
+        st.subheader("📥 Nạp hàng loạt tài khoản học sinh từ file")
+        st.caption("Tải file danh sách (.csv hoặc .xlsx). Mật khẩu mặc định gán: **123456**.")
         
-        # Tạo file CSV mẫu cho Admin tải về
         sample_df = pd.DataFrame({
             "username": ["10a1_01", "10a1_02", "10a1_03"],
             "full_name": ["Nguyễn Văn An", "Trần Thị Bình", "Lê Hoàng Cường"]
@@ -535,7 +540,7 @@ def admin_users_page():
             mime="text/csv"
         )
         
-        uploaded_file = st.file_uploader("Chọn file danh sách học sinh", type=["csv", "xlsx"])
+        uploaded_file = st.file_uploader("Kéo thả file danh sách học sinh vào đây", type=["csv", "xlsx"])
         if uploaded_file is not None:
             try:
                 if uploaded_file.name.endswith(".csv"):
@@ -543,30 +548,30 @@ def admin_users_page():
                 else:
                     df = pd.read_excel(uploaded_file)
                 
-                st.write("Xem trước danh sách:")
-                st.dataframe(df.head(), use_container_width=True)
+                st.write("Xem trước dữ liệu:")
+                st.dataframe(df.head(10), use_container_width=True)
                 
-                if st.button("Xác nhận nạp tài khoản vào hệ thống", type="primary"):
+                if st.button("Xác nhận tạo tài khoản", type="primary"):
                     if "username" not in df.columns or "full_name" not in df.columns:
-                        st.error("File cần có ít nhất 2 cột: 'username' và 'full_name'")
+                        st.error("File tải lên thiếu cột bắt buộc: 'username' hoặc 'full_name'")
                     else:
                         success_count = 0
                         duplicate_count = 0
                         for _, row in df.iterrows():
                             u_name = str(row["username"]).strip()
                             f_name = str(row["full_name"]).strip()
-                            default_pwd = "123456" # Mật khẩu theo yêu cầu đề bài
                             try:
-                                auth.create_user(current_user.id, u_name, f_name, "student", default_pwd)
+                                auth.create_user(current_user.id, u_name, f_name, "student", "123456")
                                 success_count += 1
                             except AuthError:
                                 duplicate_count += 1
-                        
-                        st.success(f" Đã tạo thành công {success_count} học sinh! (Bỏ qua {duplicate_count} tài khoản đã tồn tại).")
+                        st.success(f" Đã tạo thành công {success_count} học sinh! (Bỏ qua {duplicate_count} tài khoản đã trùng lặp).")
                         st.rerun()
             except Exception as exc:
                 st.error(f"Lỗi khi đọc file: {exc}")
-    with tab3:
+
+    users = auth.list_users(current_user.id)
+    with tab2:
         st.dataframe([{"ID": x["id"], "Tài khoản": x["username"], "Họ tên": x["full_name"], "Vai trò": ROLE_LABELS[x["role"]], "Hoạt động": "Có" if x["is_active"] else "Đã khóa", "Đổi MK": "Bắt buộc" if x["must_change_password"] else "Không"} for x in users], use_container_width=True, hide_index=True)
         target = st.selectbox("Chọn tài khoản để sửa", users, format_func=lambda x: f"{x['full_name']} (@{x['username']})", key="role_target")
         c1, c2 = st.columns(2)
@@ -580,7 +585,8 @@ def admin_users_page():
                 st.rerun()
             except AuthError as exc:
                 st.error(str(exc))
-    with tab4:
+
+    with tab3:
         target = st.selectbox("Tài khoản", users, format_func=lambda x: f"{x['full_name']} (@{x['username']})", key="reset_target")
         temp = st.text_input("Mật khẩu tạm mới", value=generate_temporary_password())
         if st.button("Đặt lại mật khẩu"):
@@ -589,8 +595,6 @@ def admin_users_page():
                 st.success("Đã đặt lại. Người dùng sẽ phải đổi mật khẩu khi đăng nhập.")
             except AuthError as exc:
                 st.error(str(exc))
-
-
 def all_classes_page():
     st.header("🏫 Toàn bộ lớp")
     classes = auth.list_classes(current_user.id)
