@@ -436,7 +436,7 @@ def path_page():
         choose_next_exercise()
         st.session_state.goto_practice = True
         st.toast("Đã chọn bài phù hợp. Mở mục Luyện code ở thanh bên.")
-/*hàm thêm để tự lục lề và highlight*/
+
 import re
 
 def extract_error_line(code: str, error_text: str) -> int | None:
