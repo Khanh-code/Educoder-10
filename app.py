@@ -321,28 +321,37 @@ def diagnostic_page():
     st.header("🧭 Test trình độ đầu vào")
     st.caption("Mỗi lần làm lại, Agent chọn ngẫu nhiên câu hỏi nhưng vẫn bảo đảm phủ các kỹ năng chính.")
     questions = st.session_state.quiz
+    
     with st.form("diagnostic_form"):
-        answers: dict[str, int] = {}
+        answers: dict[str, int | None] = {}
         for index, q in enumerate(questions, 1):
             st.markdown(f"**Câu {index}. {q['question']}**")
             choice = st.radio(
                 "Chọn đáp án",
                 options=list(range(len(q["options"]))),
+                index=None,
                 format_func=lambda i, opts=q["options"]: opts[i],
                 key=f"diag_{q['id']}",
                 label_visibility="collapsed",
             )
             answers[q["id"]] = choice
             st.write("")
+        
         submitted = st.form_submit_button("Phân tích bằng EDUCODER Agent", type="primary", use_container_width=True)
+
     if submitted:
-        result = agent.evaluate_diagnostic(questions, answers)
-        agent.apply_diagnostic(st.session_state.learner, result)
-        save_profile()
-        st.session_state.diagnostic_result = result
-        st.session_state.current_exercise_id = None
-        st.success("🎉 Hoàn thành bài test! Đang mở khóa toàn bộ lộ trình...")
-        st.rerun()
+        # Kiểm tra xem có câu nào chưa chọn đáp án không
+        unanswered = [idx for idx, q in enumerate(questions, 1) if answers.get(q["id"]) is None]
+        if unanswered:
+            st.warning(f"⚠️ Bạn chưa chọn đáp án cho các câu: **{', '.join(map(str, unanswered))}**. Vui lòng hoàn thành tất cả trước khi nộp bài!")
+        else:
+            result = agent.evaluate_diagnostic(questions, answers)
+            agent.apply_diagnostic(st.session_state.learner, result)
+            save_profile()
+            st.session_state.diagnostic_result = result
+            st.session_state.current_exercise_id = None
+            st.success("🎉 Hoàn thành bài test! Đang mở khóa toàn bộ lộ trình...")
+            st.rerun()
 
     result = st.session_state.diagnostic_result
     if result:
@@ -353,11 +362,10 @@ def diagnostic_page():
         cols[2].metric("Bắt đầu từ", skill_name(result.recommended_path[0]))
         with st.expander("Xem đáp án và giải thích"):
             for q in questions:
-                st.markdown(f"- **{q['question']}**  \n  Đáp án: {q['options'][q['answer_index']]}. {q['explanation']}")
+                st.markdown(f"- **{q['question']}**\n  Đáp án: {q['options'][q['answer_index']]}. {q['explanation']}")
         if st.button("Tạo bộ câu hỏi mới"):
             reset_diagnostic()
             st.rerun()
-
 
 def path_page():
     st.header("🗺️ Lộ trình học cá nhân hóa")
