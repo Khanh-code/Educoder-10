@@ -326,13 +326,16 @@ def home_page():
 def diagnostic_page():
     result = st.session_state.get("diagnostic_result")
     questions = st.session_state.get("quiz", [])
+    user_answers = st.session_state.get("diagnostic_answers", {})
 
-    # TRƯỜNG HỢP 1: ĐÃ HOÀN THÀNH TEST (CHẾ ĐỘ XEM LẠI)
+    # ========================================================
+    # CHẾ ĐỘ XEM LẠI BÀI LÀM CỦA HỌC SINH (SAU KHI ĐÃ NỘP)
+    # ========================================================
     if result:
-        st.header("📜 Kết quả đánh giá năng lực đầu vào")
-        st.caption("Bài test đã hoàn thành. Dưới đây là phân tích chi tiết và đáp án đúng để bạn đối chiếu ôn tập.")
+        st.header("📜 Kết quả chi tiết bài test đầu vào")
+        st.caption("Dưới đây là chi tiết bài làm của bạn, đối chiếu đáp án bạn đã chọn với đáp án chính xác.")
 
-        st.success(f"Kết quả bài test: **{result.score}/{result.total} câu đúng** — Đạt trình độ: **{result.level}**")
+        st.success(f"Kết quả: **{result.score}/{result.total} câu đúng** — Xếp loại: **{result.level}**")
 
         c1, c2, c3 = st.columns(3)
         c1.metric("Điểm số", f"{result.score}/{result.total}")
@@ -340,24 +343,45 @@ def diagnostic_page():
         c3.metric("Lộ trình xuất phát", skill_name(result.recommended_path[0]))
 
         st.divider()
-        st.subheader("🔍 Chi tiết đáp án đúng & Lời giải")
+        st.subheader("📝 Chi tiết từng câu hỏi & Bài làm của bạn")
 
         for idx, q in enumerate(questions, 1):
+            chosen_idx = user_answers.get(q["id"])
+            correct_idx = q["answer_index"]
+            is_correct = (chosen_idx == correct_idx)
+
             with st.container(border=True):
-                st.markdown(f"**Câu {idx}. {q['question']}**")
+                # Tiêu đề câu hỏi kèm trạng thái Đúng / Sai
+                if chosen_idx is None:
+                    status_badge = "⚪ *Chưa trả lời*"
+                elif is_correct:
+                    status_badge = "✅ **Chính xác (+1 điểm)**"
+                else:
+                    status_badge = "❌ **Chưa chính xác (0 điểm)**"
 
+                st.markdown(f"**Câu {idx}. {q['question']}** — {status_badge}")
+
+                # Hiển thị từng phương án và đánh dấu bài làm của học sinh
                 for opt_idx, opt_text in enumerate(q["options"]):
-                    if opt_idx == q["answer_index"]:
-                        st.markdown(f"✅ **{opt_text}** *(Đáp án chính xác)*")
+                    if opt_idx == chosen_idx and is_correct:
+                        st.markdown(f"    🟢 **{opt_text}**  *(Lựa chọn của bạn — Chính xác)*")
+                    elif opt_idx == chosen_idx and not is_correct:
+                        st.markdown(f"    🔴 **{opt_text}**  *(Lựa chọn của bạn — Sai)*")
+                    elif opt_idx == correct_idx:
+                        st.markdown(f"    ✅ **{opt_text}**  *(Đáp án đúng)*")
                     else:
-                        st.markdown(f"⚪ {opt_text}")
+                        st.markdown(f"    ⚪ {opt_text}")
 
-                st.info(f"💡 **Giải thích:** {q['explanation']}")
+                # Lời giải thích
+                st.info(f"💡 **Giải thích chi tiết:** {q['explanation']}")
+
         return
 
-    # TRƯỜNG HỢP 2: CHƯA LÀM TEST (HIỂN THỊ ĐỀ THI LẦN ĐẦU)
+    # ========================================================
+    # CHẾ ĐỘ LÀM BÀI TEST LẦN ĐẦU (CHƯA NỘP)
+    # ========================================================
     st.header("🧭 Test trình độ đầu vào")
-    st.caption("Mỗi học sinh chỉ làm bài test này 1 lần duy nhất để hệ thống phân tích và mở khóa lộ trình học phù hợp.")
+    st.caption("Hãy tự chọn đáp án cho từng câu hỏi bên dưới. Hệ thống chỉ cho phép nộp bài một lần duy nhất.")
 
     with st.form("diagnostic_form"):
         answers: dict[str, int | None] = {}
@@ -379,14 +403,18 @@ def diagnostic_page():
     if submitted:
         unanswered = [idx for idx, q in enumerate(questions, 1) if answers.get(q["id"]) is None]
         if unanswered:
-            st.warning(f"⚠️ Bạn chưa chọn câu: **{', '.join(map(str, unanswered))}**. Hãy hoàn thành đầy đủ các câu trước khi nộp bài!")
+            st.warning(f"⚠️ Bạn chưa chọn câu: **{', '.join(map(str, unanswered))}**. Hãy hoàn thành đầy đủ trước khi nộp bài!")
         else:
             result = agent.evaluate_diagnostic(questions, answers)
             agent.apply_diagnostic(st.session_state.learner, result)
-            save_profile()
+            
+            # Lưu lại cả đáp án học sinh đã chọn để xem lại sau này
+            st.session_state.diagnostic_answers = answers
             st.session_state.diagnostic_result = result
             st.session_state.current_exercise_id = None
-            st.success("🎉 Hoàn thành bài test thành công! Hệ thống đang chuyển hướng...")
+            save_profile()
+            
+            st.success("🎉 Hoàn thành bài test thành công!")
             st.rerun()
 
 def path_page():
