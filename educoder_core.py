@@ -605,11 +605,8 @@ class EDUCODERAgent:
             state.correct_streak[skill] = 0
             state.error_counts[grade.error_category] = state.error_counts.get(grade.error_category, 0) + 1
 
-        llm_hint = None
-        if not grade.passed:
-            llm_hint = self.llm.socratic_hint(exercise, code, grade, hint_level)
-            if llm_hint:
-                grade.hint = llm_hint
+        # Không gọi AI khi nộp bài: chẩn đoán lỗi đã chính xác mà không cần AI, và để dành
+        # lượt gọi AI cho lúc học sinh chủ động bấm "Xin gợi ý rõ hơn" / "Luyện tập thêm".
 
         decision = self.decide_next(state, exercise, grade)
         state.history.append({

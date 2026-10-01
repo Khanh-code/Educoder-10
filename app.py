@@ -281,6 +281,7 @@ def choose_next_exercise():
     st.session_state.last_decision = None
     st.session_state.hint_level = 1
     st.session_state.advanced_solution = None
+    st.session_state.advanced_checked = False
 
 
 def reset_diagnostic():
@@ -841,18 +842,28 @@ def practice_page():
 
         submit = st.button("Chạy và chấm", type="primary", icon=":material/play_arrow:", use_container_width=True)
 
-        # CÁCH GIẢI NÂNG CAO (do AI đề xuất)
-        # - Làm SAI: không hiển thị, để học sinh tập trung sửa lỗi theo gợi ý Socratic.
-        # - Làm ĐÚNG + có cách viết tốt hơn (đã chạy qua test): hiện expander.
-        # - Làm ĐÚNG nhưng bài quá cơ bản / code đã tối ưu: ẩn hoàn toàn.
+        # CÁCH GIẢI NÂNG CAO
+        # - Làm SAI: không hiển thị, để học sinh tập trung sửa lỗi.
+        # - Làm ĐÚNG: hiện nút; AI chỉ được gọi khi học sinh bấm (tiết kiệm lượt gọi AI).
+        # - Bài quá cơ bản (không có cách giải nâng cao trong kho): ẩn hoàn toàn.
         last_grade = st.session_state.get("last_grade")
         advanced = st.session_state.get("advanced_solution")
-        if last_grade and last_grade.passed and advanced:
-            with st.expander("Cách giải nâng cao", icon=":material/lightbulb:"):
-                st.markdown(f"**{advanced.get('title', 'Cách viết tối ưu hơn')}**")
-                st.code(advanced.get("code", ""), language="python")
-                if advanced.get("explanation"):
-                    st.info(advanced["explanation"])
+        if last_grade and last_grade.passed and exercise.get("advanced_solution"):
+            if advanced:
+                with st.expander("Cách giải nâng cao", icon=":material/lightbulb:", expanded=True):
+                    st.markdown(f"**{advanced.get('title', 'Cách viết tối ưu hơn')}**")
+                    st.code(advanced.get("code", ""), language="python")
+                    if advanced.get("explanation"):
+                        st.info(advanced["explanation"])
+            elif st.session_state.get("advanced_checked"):
+                st.caption("Cách em viết đã gọn rồi, chưa có cách nào tốt hơn rõ rệt.")
+            elif st.button("Xem cách giải nâng cao", icon=":material/lightbulb:", use_container_width=True):
+                with st.spinner("Đang tìm cách giải gọn hơn cho bài của em..."):
+                    st.session_state.advanced_solution = suggest_advanced_solution(
+                        agent.llm, agent.grader, exercise, st.session_state.get("last_passed_code", code)
+                    )
+                st.session_state.advanced_checked = True
+                st.rerun()
 
 
     if submit:
@@ -871,12 +882,10 @@ def practice_page():
         st.session_state.last_grade = grade
         st.session_state.last_decision = decision
         st.session_state.advanced_solution = None
+        st.session_state.advanced_checked = False
         st.session_state.celebrate = grade.passed
         if grade.passed:
-            with st.spinner("Đang tìm cách giải gọn hơn cho bài của em..."):
-                st.session_state.advanced_solution = suggest_advanced_solution(
-                    agent.llm, agent.grader, exercise, code
-                )
+            st.session_state.last_passed_code = code
         st.rerun()
 
     with right:
