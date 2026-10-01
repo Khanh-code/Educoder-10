@@ -89,6 +89,8 @@ section[data-testid="stSidebar"] label[data-testid="stRadioOption"] * {{ outline
 .ec-dots {{ display: inline-flex; gap: 3px; }}
 .ec-dots i {{ width: 7px; height: 7px; border-radius: 50%; background: #D3DBE6; display: inline-block; }}
 .ec-dots i.on {{ background: {BLUE}; }}
+.ec-task code {{ font-family: "JetBrains Mono", monospace; font-size: .88em; background: #EEF2F7; color: #1E4468;
+  padding: .05rem .35rem; border-radius: .3rem; }}
 .ec-task {{ border-left: 3px solid {BLUE}; background: #fff; padding: .85rem 1.1rem; border-radius: 0 .6rem .6rem 0;
   margin-bottom: 1.2rem; color: {INK}; }}
 
@@ -250,7 +252,8 @@ def exercise_meta(skill: str, difficulty: int, extra: str | None = None) -> None
 
 
 def task_box(text: str) -> None:
-    _html(f"<div class='ec-task'>{escape(text)}</div>")
+    """Khung đề bài; `x` được hiển thị dạng code."""
+    _html(f"<div class='ec-task'>{_inline_code(text)}</div>")
 
 
 def code_greeting(name: str, skill: str) -> None:

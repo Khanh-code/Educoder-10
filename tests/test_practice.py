@@ -234,3 +234,19 @@ class NoveltyTests(unittest.TestCase):
         self.assertTrue(seen[0]["y_tuong_de_bai"])
         self.assertIn("Phân loại số", seen[0]["cac_bai_da_co_khong_duoc_lap_lai"])
         self.assertIn("Phân loại số", seen[1]["luu_y_lan_truoc"])
+
+
+class CleanAITextTests(unittest.TestCase):
+    def test_latex_variables_become_code(self):
+        from educoder_core import clean_ai_text
+        self.assertEqual(clean_ai_text("Nhập số kilôgam cam $n$ (số nguyên dương)."),
+                         "Nhập số kilôgam cam `n` (số nguyên dương).")
+        self.assertEqual(clean_ai_text("In $a \\times b$ nếu $x \\le 10$"), "In `a × b` nếu `x ≤ 10`")
+        self.assertEqual(clean_ai_text("Giá $5 và $10"), "Giá $5 và $10")
+
+    def test_generated_description_is_cleaned(self):
+        raw = {**DIVISIBLE_BY_5, "description": "Nhập số nguyên $n$. In CO nếu $n$ chia hết cho 5, ngược lại in KHONG."}
+        ex, reason = build_verified_practice(raw, IO_BASE, GRADER)
+        self.assertIsNotNone(ex, reason)
+        self.assertNotIn("$", ex["description"])
+        self.assertIn("`n`", ex["description"])

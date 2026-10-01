@@ -709,6 +709,7 @@ PRACTICE_SYSTEM_PROMPT = (
     "Ví dụ: bài gốc nhập 1 số rồi dùng if-else thì bài mới cũng chỉ nhập 1 số và dùng if-else, "
     "KHÔNG được chuyển sang nhập một dãy số hay dùng danh sách/vòng lặp. "
     "Đề bài viết tiếng Việt, rõ ràng, nêu chính xác định dạng dữ liệu vào/ra. "
+    "KHÔNG dùng ký hiệu LaTeX hay $...$; tên biến viết trong dấu `...` (vd `n`), phép nhân viết ×. "
     "Chỉ dùng kiến thức lớp 10: biến, input/print, if/elif/else, for/while, chuỗi, danh sách, hàm. "
     "Không dùng import (trừ math nếu thật cần). Không dùng file, mạng, random. "
     "Trả về DUY NHẤT một JSON với các khóa:\n"
@@ -981,6 +982,33 @@ def check_novelty(solution: str, kind: str, fname: str, description: str,
     return ""
 
 
+_LATEX_SYMBOLS = {
+    r"\times": "×", r"\cdot": "·", r"\leq": "≤", r"\le": "≤", r"\geq": "≥", r"\ge": "≥",
+    r"\neq": "≠", r"\ne": "≠", r"\div": "÷", r"\ldots": "...", r"\dots": "...",
+}
+
+
+def clean_ai_text(text: Any) -> str:
+    """Làm sạch chữ do AI soạn để hiển thị cho học sinh:
+    '$n$' -> '`n`', '$a \\times b$' -> '`a × b`', bỏ '**' in đậm thừa."""
+    value = str(text or "").strip()
+
+    def _math(match: "re.Match[str]") -> str:
+        inner = match.group(1).strip()
+        for latex, symbol in _LATEX_SYMBOLS.items():
+            inner = inner.replace(latex, symbol)
+        inner = re.sub(r"\\(?:text|mathrm|mathit)\{([^}]*)\}", r"\1", inner)
+        inner = inner.replace("{", "").replace("}", "").replace("\\", "")
+        return f"`{inner.strip()}`"
+
+    value = re.sub(r"\$\$(.+?)\$\$", _math, value, flags=re.S)
+    value = re.sub(r"\$(?=\S)([^$\n]+?)(?<=\S)\$(?!\d)", _math, value)
+    for latex, symbol in _LATEX_SYMBOLS.items():
+        value = value.replace(latex, symbol)
+    value = value.replace("**", "")
+    return value
+
+
 def build_verified_practice(
     raw: dict[str, Any],
     base_exercise: dict,
@@ -1002,11 +1030,11 @@ def build_verified_practice(
     if not isinstance(raw, dict):
         return None, "AI không trả về JSON hợp lệ."
 
-    title = str(raw.get("title") or "").strip()
-    description = str(raw.get("description") or "").strip()
+    title = clean_ai_text(raw.get("title"))
+    description = clean_ai_text(raw.get("description"))
     solution = str(raw.get("reference_solution") or "").strip()
     starter = str(raw.get("starter_code") or "").rstrip() + "\n"
-    hints = [str(h).strip() for h in (raw.get("hints") or []) if str(h).strip()][:3]
+    hints = [clean_ai_text(h) for h in (raw.get("hints") or []) if str(h).strip()][:3]
     tests_in = raw.get("tests") or []
     if not (title and description and solution):
         return None, "Thiếu tiêu đề, đề bài hoặc lời giải mẫu."

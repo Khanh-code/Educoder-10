@@ -129,13 +129,23 @@ st.set_page_config(
 ui.inject_css()
 
 
-@st.cache_resource
-def services():
+def data_version() -> tuple:
+    """Thời điểm sửa của các file dữ liệu bài tập. Khi file đổi (vd sau git push),
+    giá trị này đổi theo nên bộ nhớ đệm services() tự nạp lại dữ liệu mới."""
+    stamps = []
+    for name in ("exercises.json", "diagnostic.json", "curriculum.json"):
+        path = ROOT / "data" / name
+        stamps.append(path.stat().st_mtime_ns if path.exists() else 0)
+    return tuple(stamps)
+
+
+@st.cache_resource(max_entries=1)
+def services(version: tuple = ()):
     repo = ContentRepository()
     return repo, EDUCODERAgent(repo), AuthService(ROOT / "data" / "educoder.db")
 
 
-repo, agent, auth = services()
+repo, agent, auth = services(data_version())
 
 
 def auth_gate():
