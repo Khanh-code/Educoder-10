@@ -5,19 +5,19 @@
     "difficulty": 1,
     "kind": "io",
     "title": "Diện tích hình chữ nhật",
-    "description": "Nhập chiều dài a và chiều rộng b (số nguyên). In diện tích a*b.",
+    "description": "Nhập chiều dài a và chiều rộng b (số nguyên), mỗi số trên một dòng. In diện tích a*b.",
     "starter_code": "a = int(input())\nb = int(input())\n# Viết lệnh tính và in diện tích\n",
     "tests": [
       {
-        "input": "5 3\n",
+        "input": "5\n3\n",
         "output": "15"
       },
       {
-        "input": "10 7\n",
+        "input": "10\n7\n",
         "output": "70"
       },
       {
-        "input": "1 1\n",
+        "input": "1\n1\n",
         "output": "1"
       }
     ],
@@ -27,9 +27,9 @@
       "Dòng cần bổ sung có dạng: s = ... sau đó print(...)."
     ],
     "advanced_solution": {
-      "title": "Đọc nhiều giá trị trên một dòng bằng map()",
-      "code": "a, b = map(int, input().split())\nprint(a * b)",
-      "explanation": "input().split() tách dòng nhập thành các phần, map(int, ...) đổi từng phần sang số nguyên. Chỉ cần một dòng để đọc cả a và b, và in thẳng biểu thức mà không cần biến trung gian."
+      "title": "Tính và in ngay trong một dòng",
+      "code": "print(int(input()) * int(input()))",
+      "explanation": "Có thể gọi input() ngay trong biểu thức: Python đọc lần lượt từng dòng, không cần tạo biến a, b. Cách này gọn nhưng chỉ nên dùng khi giá trị không cần dùng lại."
     }
   },
   {
@@ -66,19 +66,19 @@
     "difficulty": 2,
     "kind": "io",
     "title": "Điểm trung bình ba môn",
-    "description": "Nhập ba điểm thực trên một dòng. In trung bình làm tròn 2 chữ số thập phân.",
+    "description": "Nhập điểm ba môn (số thực), mỗi điểm trên một dòng. In điểm trung bình làm tròn 2 chữ số thập phân.",
     "starter_code": "a = float(input())\nb = float(input())\nc = float(input())\n# Viết lệnh tính và in trung bình\n",
     "tests": [
       {
-        "input": "8 7 9\n",
+        "input": "8\n7\n9\n",
         "output": "8.0"
       },
       {
-        "input": "6.5 7.5 8\n",
+        "input": "6.5\n7.5\n8\n",
         "output": "7.33"
       },
       {
-        "input": "10 10 9\n",
+        "input": "10\n10\n9\n",
         "output": "9.67"
       }
     ],
@@ -88,9 +88,9 @@
       "print(round((a + b + c) / 3, 2))."
     ],
     "advanced_solution": {
-      "title": "Dùng map() và sum() để tính trung bình gọn hơn",
-      "code": "diem = list(map(float, input().split()))\nprint(round(sum(diem) / len(diem), 2))",
-      "explanation": "Lưu các điểm vào một danh sách, dùng sum() để cộng và len() để đếm. Cách này vẫn đúng khi số môn thay đổi, không phải sửa công thức."
+      "title": "Gộp phép tính và làm tròn trong một lệnh print",
+      "code": "a = float(input())\nb = float(input())\nc = float(input())\nprint(round((a + b + c) / 3, 2))",
+      "explanation": "round(x, 2) làm tròn x đến 2 chữ số thập phân. Đặt cả phép tính vào trong round() giúp không cần biến trung gian. Nhớ đặt (a + b + c) trong ngoặc trước khi chia 3."
     }
   },
   {
@@ -99,19 +99,19 @@
     "difficulty": 3,
     "kind": "io",
     "title": "Tính tiền sau giảm giá",
-    "description": "Nhập giá gốc và phần trăm giảm (đều là số). In số tiền còn lại, làm tròn 2 chữ số.",
-    "starter_code": "price = float(input())\ndiscount = float(input ())\n# Tính tiền phải trả\n",
+    "description": "Nhập giá gốc và phần trăm giảm (đều là số), mỗi số trên một dòng. In số tiền còn lại, làm tròn 2 chữ số.",
+    "starter_code": "price = float(input())\ndiscount = float(input())\n# Tính tiền phải trả\n",
     "tests": [
       {
-        "input": "100000 20\n",
+        "input": "100000\n20\n",
         "output": "80000.0"
       },
       {
-        "input": "25000 10\n",
+        "input": "25000\n10\n",
         "output": "22500.0"
       },
       {
-        "input": "99999 15\n",
+        "input": "99999\n15\n",
         "output": "84999.15"
       }
     ],
@@ -122,7 +122,7 @@
     ],
     "advanced_solution": {
       "title": "Gộp công thức thành một biểu thức",
-      "code": "price, discount = map(float, input().split())\nprint(round(price * (1 - discount / 100), 2))",
+      "code": "price = float(input())\ndiscount = float(input())\nprint(round(price * (1 - discount / 100), 2))",
       "explanation": "Số tiền còn lại = giá × (1 − phần trăm giảm/100). Viết một biểu thức giúp tránh tính riêng số tiền được giảm rồi mới trừ."
     }
   },
@@ -198,19 +198,19 @@
     "difficulty": 2,
     "kind": "io",
     "title": "Ba cạnh có tạo thành tam giác?",
-    "description": "Nhập ba số dương a b c. In YES nếu thỏa ba bất đẳng thức tam giác, ngược lại NO.",
-    "starter_code": "a = float(input())\nb = float(input())\nc = float(input  ())\n# Kiểm tra điều kiện tam giác\n",
+    "description": "Nhập ba số dương a, b, c, mỗi số trên một dòng. In YES nếu thỏa ba bất đẳng thức tam giác, ngược lại in NO.",
+    "starter_code": "a = float(input())\nb = float(input())\nc = float(input())\n# Kiểm tra điều kiện tam giác\n",
     "tests": [
       {
-        "input": "3 4 5\n",
+        "input": "3\n4\n5\n",
         "output": "YES"
       },
       {
-        "input": "1 2 3\n",
+        "input": "1\n2\n3\n",
         "output": "NO"
       },
       {
-        "input": "5 5 8\n",
+        "input": "5\n5\n8\n",
         "output": "YES"
       }
     ],
@@ -221,7 +221,7 @@
     ],
     "advanced_solution": {
       "title": "Sắp xếp ba cạnh để chỉ cần kiểm tra một điều kiện",
-      "code": "a, b, c = sorted(map(float, input().split()))\nprint(\"YES\" if a + b > c else \"NO\")",
+      "code": "a = float(input())\nb = float(input())\nc = float(input())\na, b, c = sorted([a, b, c])\nprint(\"YES\" if a + b > c else \"NO\")",
       "explanation": "Sau khi sắp xếp tăng dần, c là cạnh lớn nhất. Hai bất đẳng thức còn lại luôn đúng, nên chỉ cần kiểm tra a + b > c thay vì ba điều kiện."
     }
   },

@@ -91,13 +91,26 @@ class DiagnoserTests(unittest.TestCase):
         d = diag("c01_even_odd", "n = int(input())\nif n % 2 == 0:\n    print('chan')\nelse:\n    print('le')\n")
         self.assertIn("hoa/thường", d["problem"])
 
+    def test_starter_style_input_is_correct(self):
+        # Lỗi dữ liệu cũ: viết đúng theo code mẫu (mỗi số một dòng) lại bị chấm sai
+        grade = GRADER.grade(REPO.exercise_by_id("v01_rectangle_area"), "a = int(input())\nb = int(input())\nprint(a*b)\n")
+        self.assertTrue(grade.passed)
+
     def test_several_values_on_one_line(self):
-        d = diag("v01_rectangle_area", "a = int(input())\nb = int(input())\nprint(a*b)\n")
+        exercise = {"id": "x", "kind": "io", "skill": "variables_io", "description": "Nhập a b trên một dòng.",
+                    "tests": [{"input": "5 3\n", "output": "15"}, {"input": "2 4\n", "output": "8"}]}
+        grade = GRADER.grade(exercise, "a = int(input())\nb = int(input())\nprint(a*b)\n")
+        d = grade.diagnosis
         self.assertEqual(d["line"], 1)
         self.assertIn("split()", d["example"])
 
+    def test_split_when_values_are_on_separate_lines(self):
+        d = diag("v01_rectangle_area", "a, b = map(int, input().split())\nprint(a*b)\n")
+        self.assertEqual(d["line"], 1)
+        self.assertIn("không khớp", d["problem"])
+
     def test_not_rounded(self):
-        d = diag("v03_average", "a, b, c = map(float, input().split())\nprint((a+b+c)/3)\n")
+        d = diag("v03_average", "a = float(input())\nb = float(input())\nc = float(input())\nprint((a+b+c)/3)\n")
         self.assertIn("round", d["fix"])
 
     def test_print_inside_loop(self):
