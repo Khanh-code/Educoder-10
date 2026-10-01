@@ -10,10 +10,11 @@
 | Xem audit log | ✓ | – | – |
 | Xem tất cả lớp | ✓ | – | – |
 | Chuyển lớp cho giáo viên khác | ✓ | – | – |
-| Tạo lớp và mã tham gia | – | ✓ | – |
+| Tạo lớp, phân công giáo viên | ✓ | – | – |
+| Thêm học sinh vào lớp | ✓ | – | – |
 | Xem tiến độ lớp phụ trách | – | ✓ | – |
+| Xem chi tiết từng học sinh trong lớp phụ trách | – | ✓ | – |
 | Xem lớp giáo viên khác | ✓ | – | – |
-| Tham gia lớp bằng mã | – | – | ✓ |
 | Làm test, luyện code | – | – | ✓ |
 | Xem/sửa hồ sơ của chính mình | – | – | ✓ |
 
@@ -26,8 +27,8 @@ giao diện gọn hơn, không được xem là biện pháp bảo mật.
 1. Lần chạy đầu, tạo admin đầu tiên trong giao diện hoặc bằng `init_admin.py`.
 2. Admin tạo tài khoản giáo viên và học sinh với mật khẩu tạm.
 3. Người dùng đăng nhập lần đầu và bắt buộc đổi mật khẩu.
-4. Giáo viên tạo lớp, hệ thống sinh mã tham gia sáu ký tự hex ngẫu nhiên.
-5. Học sinh nhập mã để vào lớp.
+4. Admin tạo lớp và phân công giáo viên phụ trách.
+5. Admin thêm học sinh vào lớp (học sinh không tự vào lớp).
 6. Mỗi lần học sinh hoàn thành test hoặc nộp code, hồ sơ Agent được lưu theo
    `user_id`.
 7. Giáo viên xem thống kê tổng hợp của học sinh thuộc lớp mình; dịch vụ từ chối
@@ -68,8 +69,8 @@ streamlit run app.py
 Kịch bản trình bày ngắn:
 
 1. Đăng nhập admin, tạo một giáo viên và một học sinh.
-2. Đăng xuất; đăng nhập giáo viên, đổi mật khẩu, tạo lớp và sao chép mã lớp.
-3. Đăng xuất; đăng nhập học sinh, đổi mật khẩu, vào “Lớp của tôi” và nhập mã.
+2. Admin tạo lớp và phân công giáo viên; đăng nhập giáo viên, đổi mật khẩu và xem lớp được phân công.
+3. Admin thêm học sinh vào lớp; đăng nhập học sinh, đổi mật khẩu, vào “Lớp của tôi” để xem lớp của mình.
 4. Học sinh làm test/nộp bài code.
 5. Đăng nhập lại giáo viên để xem lượt làm, số bài giải và mức thành thạo.
 6. Trở lại admin để minh họa khóa tài khoản, chuyển lớp và audit log.

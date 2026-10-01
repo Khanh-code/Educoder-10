@@ -23,12 +23,14 @@ python init_admin.py --username admin --name "Quản trị viên EDUCODER"
 
 Sau khi đăng nhập:
 
-- **Admin** tạo/khóa tài khoản, đổi vai trò, đặt lại mật khẩu tạm, xem toàn bộ
-  lớp và nhật ký quản trị. Hệ thống không cho khóa quản trị viên cuối cùng.
-- **Giáo viên** tạo lớp, phát mã tham gia và xem tiến độ của học sinh trong
-  đúng lớp mình phụ trách. Giáo viên không được tạo admin hay đổi vai trò.
-- **Học sinh** làm test, luyện code, xem/lưu hồ sơ của chính mình và tham gia
-  lớp bằng mã. Học sinh không được đọc hồ sơ của bạn khác.
+- **Admin** tạo/khóa tài khoản, đổi vai trò, đặt lại mật khẩu tạm, **tạo lớp,
+  phân công giáo viên và thêm học sinh vào lớp**, xem toàn bộ lớp và nhật ký
+  quản trị. Hệ thống không cho khóa quản trị viên cuối cùng.
+- **Giáo viên** xem tiến độ của học sinh trong đúng lớp được admin phân công,
+  bấm vào từng học sinh để xem kết quả test, mức thành thạo, lỗi hay mắc và các
+  bài đã làm. Giáo viên không được tạo lớp, tạo tài khoản hay đổi vai trò.
+- **Học sinh** làm test, luyện code, xem hồ sơ của chính mình và xem lớp mình
+  được xếp. Học sinh không tự vào lớp và không được đọc hồ sơ của bạn khác.
 
 Tài khoản do admin tạo phải đổi mật khẩu ở lần đăng nhập đầu. Mật khẩu được băm
 bằng Argon2 qua `pwdlib`; cơ sở dữ liệu không lưu mật khẩu rõ. Dữ liệu demo nằm
@@ -73,8 +75,8 @@ LLM **không có quyền thay đổi kết quả chấm**. Đúng/sai luôn do t
 
 - `data/diagnostic.json`: 18 câu trắc nghiệm Việt hóa.
 - `data/exercises.json`: 24 bài thực hành, mỗi bài có 3–4 test và gợi ý tăng dần.
-- `data/mbpp/sanitized-mbpp.json`: bộ MBPP gốc để giáo viên tham khảo và chọn
-  bài mở rộng. MBPP dùng tiếng Anh, cần được duyệt trước khi dùng với lớp 10.
+- `data/mbpp/sanitized-mbpp.json`: bộ MBPP gốc (tiếng Anh) lưu để tham khảo khi
+  soạn thêm bài; không hiển thị trong giao diện.
 
 ## Giới hạn an toàn quan trọng
 
@@ -87,7 +89,7 @@ Pyodide chạy phía trình duyệt, kèm giới hạn CPU/RAM/network/file syst
 ## Mô hình dữ liệu RBAC
 
 - `users`: tài khoản, vai trò, trạng thái và cờ buộc đổi mật khẩu.
-- `classes`: lớp học thuộc một giáo viên và mã tham gia ngẫu nhiên.
+- `classes`: lớp học do admin tạo, thuộc một giáo viên phụ trách.
 - `class_members`: quan hệ học sinh–lớp.
 - `learning_profiles`: trạng thái Agent riêng của từng học sinh.
 - `audit_logs`: dấu vết tạo tài khoản, đổi quyền, khóa tài khoản, tạo/tham gia lớp.

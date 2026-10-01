@@ -7,3 +7,5 @@ data/educoder.db
 data/educoder.db-shm
 data/educoder.db-wal
 .streamlit/secrets.toml
+# Bản sao lưu cục bộ, không đưa lên GitHub
+_backup_truoc_khi_sua/

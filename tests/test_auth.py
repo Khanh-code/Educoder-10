@@ -27,8 +27,8 @@ class AuthAndRBACTests(unittest.TestCase):
             self.auth.create_user(self.teacher.id, "xstudent", "X", "student", "Password1234")
 
     def test_teacher_sees_only_own_class_students(self):
-        classroom = self.auth.create_class(self.teacher.id, "10A1")
-        self.auth.join_class(self.student.id, classroom["join_code"])
+        classroom = self.auth.create_class(self.admin.id, "10A1", self.teacher.id)
+        self.auth.add_student_to_class(self.admin.id, classroom["id"], self.student.id)
         rows = self.auth.class_students(self.teacher.id, classroom["id"])
         self.assertEqual([x["username"] for x in rows], ["student1"])
 
@@ -41,6 +41,28 @@ class AuthAndRBACTests(unittest.TestCase):
 
         self.auth.reassign_class(self.admin.id, classroom["id"], teacher2.id)
         self.assertEqual(self.auth.class_students(teacher2.id, classroom["id"])[0]["username"], "student1")
+
+    def test_only_admin_can_create_class(self):
+        with self.assertRaises(PermissionDenied):
+            self.auth.create_class(self.teacher.id, "Lớp tự tạo")
+        with self.assertRaises(PermissionDenied):
+            self.auth.create_class(self.student.id, "Lớp tự tạo")
+        with self.assertRaises(ValidationError):
+            self.auth.create_class(self.admin.id, "10A2", self.student.id)  # phụ trách phải là giáo viên
+        classroom = self.auth.create_class(self.admin.id, "10A2", self.teacher.id)
+        self.assertEqual([c["name"] for c in self.auth.list_classes(self.teacher.id)], ["10A2"])
+        self.assertTrue(classroom["join_code"])
+
+    def test_only_admin_can_add_students_to_class(self):
+        classroom = self.auth.create_class(self.admin.id, "10A3", self.teacher.id)
+        with self.assertRaises(PermissionDenied):
+            self.auth.add_student_to_class(self.student.id, classroom["id"], self.student.id)
+        with self.assertRaises(PermissionDenied):
+            self.auth.add_student_to_class(self.teacher.id, classroom["id"], self.student.id)
+        with self.assertRaises(ValidationError):
+            self.auth.add_student_to_class(self.admin.id, classroom["id"], self.teacher.id)
+        self.auth.add_student_to_class(self.admin.id, classroom["id"], self.student.id)
+        self.assertEqual([c["name"] for c in self.auth.list_classes(self.student.id)], ["10A3"])
 
     def test_student_cannot_read_other_profile(self):
         student2 = self.auth.create_user(self.admin.id, "student2", "Bạn C", "student", "Student5678")

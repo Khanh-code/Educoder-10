@@ -7,8 +7,30 @@
     "title": "Diện tích hình chữ nhật",
     "description": "Nhập chiều dài a và chiều rộng b (số nguyên). In diện tích a*b.",
     "starter_code": "a = int(input())\nb = int(input())\n# Viết lệnh tính và in diện tích\n",
-    "tests": [{"input": "5 3\n", "output": "15"}, {"input": "10 7\n", "output": "70"}, {"input": "1 1\n", "output": "1"}],
-    "hints": ["Công thức diện tích là chiều dài nhân chiều rộng.", "Tạo biến s = a * b rồi print(s).", "Dòng cần bổ sung có dạng: s = ... sau đó print(...)."]
+    "tests": [
+      {
+        "input": "5 3\n",
+        "output": "15"
+      },
+      {
+        "input": "10 7\n",
+        "output": "70"
+      },
+      {
+        "input": "1 1\n",
+        "output": "1"
+      }
+    ],
+    "hints": [
+      "Công thức diện tích là chiều dài nhân chiều rộng.",
+      "Tạo biến s = a * b rồi print(s).",
+      "Dòng cần bổ sung có dạng: s = ... sau đó print(...)."
+    ],
+    "advanced_solution": {
+      "title": "Đọc nhiều giá trị trên một dòng bằng map()",
+      "code": "a, b = map(int, input().split())\nprint(a * b)",
+      "explanation": "input().split() tách dòng nhập thành các phần, map(int, ...) đổi từng phần sang số nguyên. Chỉ cần một dòng để đọc cả a và b, và in thẳng biểu thức mà không cần biến trung gian."
+    }
   },
   {
     "id": "v02_seconds",
@@ -18,8 +40,25 @@
     "title": "Đổi phút thành giây",
     "description": "Nhập số phút nguyên m. In số giây tương ứng.",
     "starter_code": "m = int(input())\n# Tính số giây\n",
-    "tests": [{"input": "2\n", "output": "120"}, {"input": "15\n", "output": "900"}, {"input": "0\n", "output": "0"}],
-    "hints": ["Một phút có 60 giây.", "Lấy m nhân 60.", "In trực tiếp m * 60 hoặc gán vào một biến."]
+    "tests": [
+      {
+        "input": "2\n",
+        "output": "120"
+      },
+      {
+        "input": "15\n",
+        "output": "900"
+      },
+      {
+        "input": "0\n",
+        "output": "0"
+      }
+    ],
+    "hints": [
+      "Một phút có 60 giây.",
+      "Lấy m nhân 60.",
+      "In trực tiếp m * 60 hoặc gán vào một biến."
+    ]
   },
   {
     "id": "v03_average",
@@ -29,8 +68,30 @@
     "title": "Điểm trung bình ba môn",
     "description": "Nhập ba điểm thực trên một dòng. In trung bình làm tròn 2 chữ số thập phân.",
     "starter_code": "a = float(input())\nb = float(input())\nc = float(input())\n# Viết lệnh tính và in trung bình\n",
-    "tests": [{"input": "8 7 9\n", "output": "8.0"}, {"input": "6.5 7.5 8\n", "output": "7.33"}, {"input": "10 10 9\n", "output": "9.67"}],
-    "hints": ["Trung bình bằng tổng chia 3.", "Dùng round(gia_tri, 2).", "print(round((a + b + c) / 3, 2))."]
+    "tests": [
+      {
+        "input": "8 7 9\n",
+        "output": "8.0"
+      },
+      {
+        "input": "6.5 7.5 8\n",
+        "output": "7.33"
+      },
+      {
+        "input": "10 10 9\n",
+        "output": "9.67"
+      }
+    ],
+    "hints": [
+      "Trung bình bằng tổng chia 3.",
+      "Dùng round(gia_tri, 2).",
+      "print(round((a + b + c) / 3, 2))."
+    ],
+    "advanced_solution": {
+      "title": "Dùng map() và sum() để tính trung bình gọn hơn",
+      "code": "diem = list(map(float, input().split()))\nprint(round(sum(diem) / len(diem), 2))",
+      "explanation": "Lưu các điểm vào một danh sách, dùng sum() để cộng và len() để đếm. Cách này vẫn đúng khi số môn thay đổi, không phải sửa công thức."
+    }
   },
   {
     "id": "v04_money",
@@ -40,10 +101,31 @@
     "title": "Tính tiền sau giảm giá",
     "description": "Nhập giá gốc và phần trăm giảm (đều là số). In số tiền còn lại, làm tròn 2 chữ số.",
     "starter_code": "price = float(input())\ndiscount = float(input ())\n# Tính tiền phải trả\n",
-    "tests": [{"input": "100000 20\n", "output": "80000.0"}, {"input": "25000 10\n", "output": "22500.0"}, {"input": "99999 15\n", "output": "84999.15"}],
-    "hints": ["Số tiền giảm = giá * phần trăm / 100.", "Tiền còn lại = giá * (1 - phần trăm/100).", "Dùng round(..., 2) trước khi in."]
+    "tests": [
+      {
+        "input": "100000 20\n",
+        "output": "80000.0"
+      },
+      {
+        "input": "25000 10\n",
+        "output": "22500.0"
+      },
+      {
+        "input": "99999 15\n",
+        "output": "84999.15"
+      }
+    ],
+    "hints": [
+      "Số tiền giảm = giá * phần trăm / 100.",
+      "Tiền còn lại = giá * (1 - phần trăm/100).",
+      "Dùng round(..., 2) trước khi in."
+    ],
+    "advanced_solution": {
+      "title": "Gộp công thức thành một biểu thức",
+      "code": "price, discount = map(float, input().split())\nprint(round(price * (1 - discount / 100), 2))",
+      "explanation": "Số tiền còn lại = giá × (1 − phần trăm giảm/100). Viết một biểu thức giúp tránh tính riêng số tiền được giảm rồi mới trừ."
+    }
   },
-
   {
     "id": "c01_even_odd",
     "skill": "conditions",
@@ -52,8 +134,30 @@
     "title": "Chẵn hay lẻ",
     "description": "Nhập số nguyên n. In CHAN nếu n chẵn, ngược lại in LE.",
     "starter_code": "n = int(input())\n# Viết cấu trúc if-else\n",
-    "tests": [{"input": "8\n", "output": "CHAN"}, {"input": "7\n", "output": "LE"}, {"input": "0\n", "output": "CHAN"}],
-    "hints": ["Dùng phép chia lấy dư cho 2.", "Điều kiện là n % 2 == 0.", "Nhớ dấu hai chấm và thụt lề sau if/else."]
+    "tests": [
+      {
+        "input": "8\n",
+        "output": "CHAN"
+      },
+      {
+        "input": "7\n",
+        "output": "LE"
+      },
+      {
+        "input": "0\n",
+        "output": "CHAN"
+      }
+    ],
+    "hints": [
+      "Dùng phép chia lấy dư cho 2.",
+      "Điều kiện là n % 2 == 0.",
+      "Nhớ dấu hai chấm và thụt lề sau if/else."
+    ],
+    "advanced_solution": {
+      "title": "Toán tử 3 ngôi (biểu thức điều kiện)",
+      "code": "n = int(input())\nprint(\"CHAN\" if n % 2 == 0 else \"LE\")",
+      "explanation": "Cú pháp giá_trị_1 if điều_kiện else giá_trị_2 chọn một trong hai giá trị ngay trong một dòng. Nên dùng khi mỗi nhánh chỉ trả về một giá trị đơn giản."
+    }
   },
   {
     "id": "c02_positive",
@@ -63,8 +167,30 @@
     "title": "Phân loại số",
     "description": "Nhập số nguyên n. In DUONG, AM hoặc KHONG tương ứng.",
     "starter_code": "n = int(input())\n# Dùng if-elif-else\n",
-    "tests": [{"input": "5\n", "output": "DUONG"}, {"input": "-3\n", "output": "AM"}, {"input": "0\n", "output": "KHONG"}],
-    "hints": ["Có ba trường hợp nên dùng if, elif và else.", "Kiểm tra n > 0 trước, sau đó n < 0.", "else còn lại chính là n == 0."]
+    "tests": [
+      {
+        "input": "5\n",
+        "output": "DUONG"
+      },
+      {
+        "input": "-3\n",
+        "output": "AM"
+      },
+      {
+        "input": "0\n",
+        "output": "KHONG"
+      }
+    ],
+    "hints": [
+      "Có ba trường hợp nên dùng if, elif và else.",
+      "Kiểm tra n > 0 trước, sau đó n < 0.",
+      "else còn lại chính là n == 0."
+    ],
+    "advanced_solution": {
+      "title": "Toán tử 3 ngôi lồng nhau",
+      "code": "n = int(input())\nprint(\"DUONG\" if n > 0 else \"AM\" if n < 0 else \"KHONG\")",
+      "explanation": "Python đọc từ trái sang phải: nếu n > 0 thì DUONG, nếu không thì xét tiếp n < 0, cuối cùng là KHONG. Chỉ nên lồng tối đa 2 tầng; nhiều hơn thì dùng if-elif-else cho dễ đọc."
+    }
   },
   {
     "id": "c03_triangle",
@@ -74,8 +200,30 @@
     "title": "Ba cạnh có tạo thành tam giác?",
     "description": "Nhập ba số dương a b c. In YES nếu thỏa ba bất đẳng thức tam giác, ngược lại NO.",
     "starter_code": "a = float(input())\nb = float(input())\nc = float(input  ())\n# Kiểm tra điều kiện tam giác\n",
-    "tests": [{"input": "3 4 5\n", "output": "YES"}, {"input": "1 2 3\n", "output": "NO"}, {"input": "5 5 8\n", "output": "YES"}],
-    "hints": ["Tổng hai cạnh bất kỳ phải lớn hơn cạnh còn lại.", "Ghép ba điều kiện bằng and.", "Kiểm tra a+b>c, a+c>b và b+c>a."]
+    "tests": [
+      {
+        "input": "3 4 5\n",
+        "output": "YES"
+      },
+      {
+        "input": "1 2 3\n",
+        "output": "NO"
+      },
+      {
+        "input": "5 5 8\n",
+        "output": "YES"
+      }
+    ],
+    "hints": [
+      "Tổng hai cạnh bất kỳ phải lớn hơn cạnh còn lại.",
+      "Ghép ba điều kiện bằng and.",
+      "Kiểm tra a+b>c, a+c>b và b+c>a."
+    ],
+    "advanced_solution": {
+      "title": "Sắp xếp ba cạnh để chỉ cần kiểm tra một điều kiện",
+      "code": "a, b, c = sorted(map(float, input().split()))\nprint(\"YES\" if a + b > c else \"NO\")",
+      "explanation": "Sau khi sắp xếp tăng dần, c là cạnh lớn nhất. Hai bất đẳng thức còn lại luôn đúng, nên chỉ cần kiểm tra a + b > c thay vì ba điều kiện."
+    }
   },
   {
     "id": "c04_grade",
@@ -85,10 +233,35 @@
     "title": "Xếp loại điểm",
     "description": "Nhập điểm 0..10. In GIOI nếu >=8, KHA nếu >=6.5, DAT nếu >=5, CHUA_DAT nếu thấp hơn; ngoài khoảng in KHONG_HOP_LE.",
     "starter_code": "score = float(input())\n# Xếp loại theo thứ tự điều kiện\n",
-    "tests": [{"input": "8.5\n", "output": "GIOI"}, {"input": "7\n", "output": "KHA"}, {"input": "4.5\n", "output": "CHUA_DAT"}, {"input": "12\n", "output": "KHONG_HOP_LE"}],
-    "hints": ["Kiểm tra dữ liệu không hợp lệ trước.", "Sau đó xét từ ngưỡng cao xuống thấp.", "0 <= score <= 10 là khoảng hợp lệ."]
+    "tests": [
+      {
+        "input": "8.5\n",
+        "output": "GIOI"
+      },
+      {
+        "input": "7\n",
+        "output": "KHA"
+      },
+      {
+        "input": "4.5\n",
+        "output": "CHUA_DAT"
+      },
+      {
+        "input": "12\n",
+        "output": "KHONG_HOP_LE"
+      }
+    ],
+    "hints": [
+      "Kiểm tra dữ liệu không hợp lệ trước.",
+      "Sau đó xét từ ngưỡng cao xuống thấp.",
+      "0 <= score <= 10 là khoảng hợp lệ."
+    ],
+    "advanced_solution": {
+      "title": "So sánh kép và kiểm tra dữ liệu không hợp lệ trước",
+      "code": "score = float(input())\nif not 0 <= score <= 10:\n    print(\"KHONG_HOP_LE\")\nelif score >= 8:\n    print(\"GIOI\")\nelif score >= 6.5:\n    print(\"KHA\")\nelif score >= 5:\n    print(\"DAT\")\nelse:\n    print(\"CHUA_DAT\")",
+      "explanation": "Python cho phép viết 0 <= score <= 10 giống ký hiệu toán học. Loại trường hợp sai trước, sau đó xét từ mức cao xuống thấp, nên mỗi nhánh elif chỉ cần một điều kiện."
+    }
   },
-
   {
     "id": "l01_sum_n",
     "skill": "loops",
@@ -97,8 +270,30 @@
     "title": "Tổng từ 1 đến n",
     "description": "Nhập n không âm. Dùng vòng lặp tính 1+2+...+n và in kết quả.",
     "starter_code": "n = int(input())\ns = 0\n# Dùng for để cộng dồn\n",
-    "tests": [{"input": "5\n", "output": "15"}, {"input": "1\n", "output": "1"}, {"input": "0\n", "output": "0"}],
-    "hints": ["Dùng biến s khởi tạo bằng 0.", "range(1, n + 1) chứa cả n.", "Trong vòng lặp: s += i; sau vòng lặp mới print(s)."]
+    "tests": [
+      {
+        "input": "5\n",
+        "output": "15"
+      },
+      {
+        "input": "1\n",
+        "output": "1"
+      },
+      {
+        "input": "0\n",
+        "output": "0"
+      }
+    ],
+    "hints": [
+      "Dùng biến s khởi tạo bằng 0.",
+      "range(1, n + 1) chứa cả n.",
+      "Trong vòng lặp: s += i; sau vòng lặp mới print(s)."
+    ],
+    "advanced_solution": {
+      "title": "Dùng hàm sum() hoặc công thức Gauss",
+      "code": "n = int(input())\nprint(sum(range(1, n + 1)))\n# Hoặc dùng công thức, không cần lặp:\n# print(n * (n + 1) // 2)",
+      "explanation": "sum(range(1, n + 1)) cộng mọi số trong dãy mà không cần tự viết vòng lặp. Công thức n(n+1)/2 còn nhanh hơn vì chỉ tính một phép, dù n lớn đến đâu."
+    }
   },
   {
     "id": "l02_countdown",
@@ -108,8 +303,30 @@
     "title": "Đếm ngược",
     "description": "Nhập n > 0. In các số từ n về 1 trên một dòng, cách nhau một khoảng trắng.",
     "starter_code": "n = int(input())\n# Dùng range với bước -1\n",
-    "tests": [{"input": "5\n", "output": "5 4 3 2 1"}, {"input": "1\n", "output": "1"}, {"input": "3\n", "output": "3 2 1"}],
-    "hints": ["range có thể nhận bước âm.", "Cận dừng phải là 0 để giá trị cuối là 1.", "Dùng print(i, end=' ') trong vòng lặp."]
+    "tests": [
+      {
+        "input": "5\n",
+        "output": "5 4 3 2 1"
+      },
+      {
+        "input": "1\n",
+        "output": "1"
+      },
+      {
+        "input": "3\n",
+        "output": "3 2 1"
+      }
+    ],
+    "hints": [
+      "range có thể nhận bước âm.",
+      "Cận dừng phải là 0 để giá trị cuối là 1.",
+      "Dùng print(i, end=' ') trong vòng lặp."
+    ],
+    "advanced_solution": {
+      "title": "In cả dãy bằng toán tử giải nén *",
+      "code": "n = int(input())\nprint(*range(n, 0, -1))",
+      "explanation": "Dấu * tách range thành từng số rồi truyền vào print(); print tự đặt dấu cách giữa các giá trị, nên không cần vòng lặp hay end=' '."
+    }
   },
   {
     "id": "l03_digits",
@@ -119,8 +336,30 @@
     "title": "Tổng các chữ số",
     "description": "Nhập số nguyên không âm n. Dùng while tính tổng các chữ số.",
     "starter_code": "n = int(input())\ns = 0\n# Lặp khi n còn lớn hơn 0\n",
-    "tests": [{"input": "1234\n", "output": "10"}, {"input": "7\n", "output": "7"}, {"input": "1005\n", "output": "6"}],
-    "hints": ["Chữ số cuối là n % 10.", "Bỏ chữ số cuối bằng n //= 10.", "Mỗi vòng lặp cộng n % 10 vào s rồi giảm n."]
+    "tests": [
+      {
+        "input": "1234\n",
+        "output": "10"
+      },
+      {
+        "input": "7\n",
+        "output": "7"
+      },
+      {
+        "input": "1005\n",
+        "output": "6"
+      }
+    ],
+    "hints": [
+      "Chữ số cuối là n % 10.",
+      "Bỏ chữ số cuối bằng n //= 10.",
+      "Mỗi vòng lặp cộng n % 10 vào s rồi giảm n."
+    ],
+    "advanced_solution": {
+      "title": "Coi số như chuỗi ký tự",
+      "code": "n = input()\nprint(sum(map(int, n)))",
+      "explanation": "Chuỗi '1234' gồm các ký tự '1','2','3','4'. map(int, ...) đổi từng ký tự thành số và sum() cộng lại. Cách dùng while với % 10 và // 10 vẫn quan trọng để hiểu thuật toán."
+    }
   },
   {
     "id": "l04_prime",
@@ -130,10 +369,31 @@
     "title": "Hàm kiểm tra số nguyên tố",
     "description": "Viết hàm is_prime(n) trả True nếu n là số nguyên tố, ngược lại False.",
     "starter_code": "def is_prime(n):\n    # Viết code\n    pass\n",
-    "tests": [{"assert": "assert is_prime(2) is True"}, {"assert": "assert is_prime(17) is True"}, {"assert": "assert is_prime(1) is False"}, {"assert": "assert is_prime(25) is False"}],
-    "hints": ["Số nhỏ hơn 2 không phải số nguyên tố.", "Chỉ cần thử ước từ 2 đến căn bậc hai của n.", "Nếu gặp n % i == 0 thì trả False; hết vòng lặp trả True."]
+    "tests": [
+      {
+        "assert": "assert is_prime(2) is True"
+      },
+      {
+        "assert": "assert is_prime(17) is True"
+      },
+      {
+        "assert": "assert is_prime(1) is False"
+      },
+      {
+        "assert": "assert is_prime(25) is False"
+      }
+    ],
+    "hints": [
+      "Số nhỏ hơn 2 không phải số nguyên tố.",
+      "Chỉ cần thử ước từ 2 đến căn bậc hai của n.",
+      "Nếu gặp n % i == 0 thì trả False; hết vòng lặp trả True."
+    ],
+    "advanced_solution": {
+      "title": "Chỉ cần thử ước đến căn bậc hai của n",
+      "code": "def is_prime(n):\n    if n < 2:\n        return False\n    for d in range(2, int(n ** 0.5) + 1):\n        if n % d == 0:\n            return False\n    return True",
+      "explanation": "Nếu n có ước d > √n thì n cũng có ước n/d < √n. Vì vậy chỉ cần thử đến √n: với n = 1.000.000 chỉ mất khoảng 1.000 lần lặp thay vì 1.000.000."
+    }
   },
-
   {
     "id": "s01_count_a",
     "skill": "strings_lists",
@@ -142,8 +402,30 @@
     "title": "Đếm chữ a",
     "description": "Nhập một dòng chữ. In số lần ký tự 'a' xuất hiện, không phân biệt hoa thường.",
     "starter_code": "text = input()\n# Chuyển về chữ thường và đếm\n",
-    "tests": [{"input": "Banana\n", "output": "3"}, {"input": "PYTHON\n", "output": "0"}, {"input": "An Giang\n", "output": "2"}],
-    "hints": ["Dùng lower() để không phân biệt hoa thường.", "Chuỗi có phương thức count.", "print(text.lower().count('a'))."]
+    "tests": [
+      {
+        "input": "Banana\n",
+        "output": "3"
+      },
+      {
+        "input": "PYTHON\n",
+        "output": "0"
+      },
+      {
+        "input": "An Giang\n",
+        "output": "2"
+      }
+    ],
+    "hints": [
+      "Dùng lower() để không phân biệt hoa thường.",
+      "Chuỗi có phương thức count.",
+      "print(text.lower().count('a'))."
+    ],
+    "advanced_solution": {
+      "title": "Dùng phương thức có sẵn lower() và count()",
+      "code": "text = input()\nprint(text.lower().count(\"a\"))",
+      "explanation": "lower() đổi cả chuỗi về chữ thường, count('a') đếm số lần xuất hiện. Hai phương thức có sẵn thay cho vòng lặp và biến đếm."
+    }
   },
   {
     "id": "s02_max_list",
@@ -153,8 +435,30 @@
     "title": "Giá trị lớn nhất",
     "description": "Dòng đầu là n, dòng sau gồm n số nguyên. In số lớn nhất.",
     "starter_code": "n = int(input())\na = list(map(int, input().split()))\n# In phần tử lớn nhất\n",
-    "tests": [{"input": "5\n3 8 2 11 5\n", "output": "11"}, {"input": "3\n-5 -2 -9\n", "output": "-2"}, {"input": "1\n42\n", "output": "42"}],
-    "hints": ["Có thể dùng hàm max.", "max(a) trả phần tử lớn nhất.", "Chỉ cần print(max(a))."]
+    "tests": [
+      {
+        "input": "5\n3 8 2 11 5\n",
+        "output": "11"
+      },
+      {
+        "input": "3\n-5 -2 -9\n",
+        "output": "-2"
+      },
+      {
+        "input": "1\n42\n",
+        "output": "42"
+      }
+    ],
+    "hints": [
+      "Có thể dùng hàm max.",
+      "max(a) trả phần tử lớn nhất.",
+      "Chỉ cần print(max(a))."
+    ],
+    "advanced_solution": {
+      "title": "Dùng hàm max() có sẵn",
+      "code": "n = int(input())\na = list(map(int, input().split()))\nprint(max(a))",
+      "explanation": "max() trả về phần tử lớn nhất của danh sách. Tự viết vòng lặp giúp hiểu thuật toán, còn khi làm bài thực tế nên dùng hàm có sẵn cho ngắn gọn và ít lỗi."
+    }
   },
   {
     "id": "s03_unique",
@@ -164,8 +468,27 @@
     "title": "Loại phần tử trùng nhưng giữ thứ tự",
     "description": "Viết hàm unique_order(a) trả danh sách chỉ giữ lần xuất hiện đầu tiên.",
     "starter_code": "def unique_order(a):\n    result = []\n    # Duyệt a và thêm phần tử chưa có\n    return result\n",
-    "tests": [{"assert": "assert unique_order([1, 2, 1, 3, 2]) == [1, 2, 3]"}, {"assert": "assert unique_order([]) == []"}, {"assert": "assert unique_order(['a', 'a', 'b']) == ['a', 'b']"}],
-    "hints": ["Tạo list kết quả rỗng.", "Với mỗi x, kiểm tra x not in result.", "Chỉ append khi x chưa xuất hiện trong result."]
+    "tests": [
+      {
+        "assert": "assert unique_order([1, 2, 1, 3, 2]) == [1, 2, 3]"
+      },
+      {
+        "assert": "assert unique_order([]) == []"
+      },
+      {
+        "assert": "assert unique_order(['a', 'a', 'b']) == ['a', 'b']"
+      }
+    ],
+    "hints": [
+      "Tạo list kết quả rỗng.",
+      "Với mỗi x, kiểm tra x not in result.",
+      "Chỉ append khi x chưa xuất hiện trong result."
+    ],
+    "advanced_solution": {
+      "title": "Dùng dict.fromkeys() để loại trùng mà giữ thứ tự",
+      "code": "def unique_order(a):\n    return list(dict.fromkeys(a))",
+      "explanation": "Khóa của dict không được trùng và giữ đúng thứ tự thêm vào. dict.fromkeys(a) tạo dict có khóa là các phần tử của a, list(...) lấy lại danh sách khóa. Không dùng set() vì set không giữ thứ tự."
+    }
   },
   {
     "id": "s04_second_largest",
@@ -175,10 +498,31 @@
     "title": "Số lớn thứ hai phân biệt",
     "description": "Viết hàm second_largest(a) trả số lớn thứ hai khác số lớn nhất; nếu không có trả None.",
     "starter_code": "def second_largest(a):\n    # Viết code\n    pass\n",
-    "tests": [{"assert": "assert second_largest([3, 8, 8, 2, 5]) == 5"}, {"assert": "assert second_largest([1]) is None"}, {"assert": "assert second_largest([4, 4, 4]) is None"}, {"assert": "assert second_largest([-1, -3, -2]) == -2"}],
-    "hints": ["Cần loại các giá trị trùng trước.", "Có thể dùng set rồi sắp xếp.", "Nếu còn ít hơn 2 giá trị phân biệt thì trả None."]
+    "tests": [
+      {
+        "assert": "assert second_largest([3, 8, 8, 2, 5]) == 5"
+      },
+      {
+        "assert": "assert second_largest([1]) is None"
+      },
+      {
+        "assert": "assert second_largest([4, 4, 4]) is None"
+      },
+      {
+        "assert": "assert second_largest([-1, -3, -2]) == -2"
+      }
+    ],
+    "hints": [
+      "Cần loại các giá trị trùng trước.",
+      "Có thể dùng set rồi sắp xếp.",
+      "Nếu còn ít hơn 2 giá trị phân biệt thì trả None."
+    ],
+    "advanced_solution": {
+      "title": "Loại trùng bằng set() rồi sắp xếp",
+      "code": "def second_largest(a):\n    b = sorted(set(a))\n    return b[-2] if len(b) >= 2 else None",
+      "explanation": "set(a) bỏ các giá trị trùng, sorted() sắp xếp tăng dần, b[-2] là phần tử đứng thứ hai từ cuối. Nếu còn ít hơn 2 giá trị khác nhau thì trả None."
+    }
   },
-
   {
     "id": "f01_square",
     "skill": "functions",
@@ -187,8 +531,22 @@
     "title": "Hàm bình phương",
     "description": "Viết hàm square(x) trả về bình phương của x.",
     "starter_code": "def square(x):\n    # Trả về x bình phương\n    pass\n",
-    "tests": [{"assert": "assert square(5) == 25"}, {"assert": "assert square(-3) == 9"}, {"assert": "assert square(0) == 0"}],
-    "hints": ["Hàm cần trả giá trị, không chỉ print.", "Bình phương là x * x.", "Dùng return x * x."]
+    "tests": [
+      {
+        "assert": "assert square(5) == 25"
+      },
+      {
+        "assert": "assert square(-3) == 9"
+      },
+      {
+        "assert": "assert square(0) == 0"
+      }
+    ],
+    "hints": [
+      "Hàm cần trả giá trị, không chỉ print.",
+      "Bình phương là x * x.",
+      "Dùng return x * x."
+    ]
   },
   {
     "id": "f02_abs",
@@ -198,8 +556,27 @@
     "title": "Tự viết giá trị tuyệt đối",
     "description": "Viết hàm my_abs(x) trả giá trị tuyệt đối mà không dùng abs().",
     "starter_code": "def my_abs(x):\n    # Dùng if\n    pass\n",
-    "tests": [{"assert": "assert my_abs(7) == 7"}, {"assert": "assert my_abs(-4) == 4"}, {"assert": "assert my_abs(0) == 0"}],
-    "hints": ["Nếu x âm thì đổi dấu.", "Có thể return -x khi x < 0.", "Trường hợp còn lại return x."]
+    "tests": [
+      {
+        "assert": "assert my_abs(7) == 7"
+      },
+      {
+        "assert": "assert my_abs(-4) == 4"
+      },
+      {
+        "assert": "assert my_abs(0) == 0"
+      }
+    ],
+    "hints": [
+      "Nếu x âm thì đổi dấu.",
+      "Có thể return -x khi x < 0.",
+      "Trường hợp còn lại return x."
+    ],
+    "advanced_solution": {
+      "title": "Toán tử 3 ngôi trong câu lệnh return",
+      "code": "def my_abs(x):\n    return x if x >= 0 else -x",
+      "explanation": "Một dòng return thay cho khối if-else hai nhánh. Cách viết này hợp với hàm chỉ cần chọn giữa hai giá trị."
+    }
   },
   {
     "id": "f03_gcd",
@@ -209,8 +586,27 @@
     "title": "Ước chung lớn nhất",
     "description": "Viết hàm gcd(a, b) bằng thuật toán Euclid, với a và b không âm.",
     "starter_code": "def gcd(a, b):\n    # Lặp khi b khác 0\n    pass\n",
-    "tests": [{"assert": "assert gcd(12, 18) == 6"}, {"assert": "assert gcd(17, 5) == 1"}, {"assert": "assert gcd(0, 9) == 9"}],
-    "hints": ["Thuật toán Euclid thay (a,b) bằng (b,a%b).", "Lặp while b != 0.", "Khi b bằng 0, a là kết quả."]
+    "tests": [
+      {
+        "assert": "assert gcd(12, 18) == 6"
+      },
+      {
+        "assert": "assert gcd(17, 5) == 1"
+      },
+      {
+        "assert": "assert gcd(0, 9) == 9"
+      }
+    ],
+    "hints": [
+      "Thuật toán Euclid thay (a,b) bằng (b,a%b).",
+      "Lặp while b != 0.",
+      "Khi b bằng 0, a là kết quả."
+    ],
+    "advanced_solution": {
+      "title": "Gán đồng thời hai biến",
+      "code": "def gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a\n\n# Thực tế có thể dùng hàm có sẵn:\n# from math import gcd",
+      "explanation": "a, b = b, a % b cập nhật cả hai biến cùng lúc, không cần biến tạm. while b nghĩa là lặp khi b khác 0. Thư viện math cũng có sẵn gcd()."
+    }
   },
   {
     "id": "f04_palindrome",
@@ -220,10 +616,28 @@
     "title": "Kiểm tra chuỗi đối xứng",
     "description": "Viết is_palindrome(text): bỏ khoảng trắng, không phân biệt hoa thường, rồi kiểm tra đối xứng.",
     "starter_code": "def is_palindrome(text):\n    # Chuẩn hóa rồi kiểm tra\n    pass\n",
-    "tests": [{"assert": "assert is_palindrome('level') is True"}, {"assert": "assert is_palindrome('Never odd or even') is True"}, {"assert": "assert is_palindrome('Python') is False"}],
-    "hints": ["Dùng lower() và replace(' ', '').", "Chuỗi đảo có thể lấy bằng s[::-1].", "So sánh chuỗi chuẩn hóa với chính nó đảo ngược."]
+    "tests": [
+      {
+        "assert": "assert is_palindrome('level') is True"
+      },
+      {
+        "assert": "assert is_palindrome('Never odd or even') is True"
+      },
+      {
+        "assert": "assert is_palindrome('Python') is False"
+      }
+    ],
+    "hints": [
+      "Dùng lower() và replace(' ', '').",
+      "Chuỗi đảo có thể lấy bằng s[::-1].",
+      "So sánh chuỗi chuẩn hóa với chính nó đảo ngược."
+    ],
+    "advanced_solution": {
+      "title": "So sánh chuỗi với chuỗi đảo ngược bằng lát cắt [::-1]",
+      "code": "def is_palindrome(text):\n    s = text.replace(\" \", \"\").lower()\n    return s == s[::-1]",
+      "explanation": "s[::-1] tạo chuỗi đảo ngược của s. Phép so sánh s == s[::-1] trả về True/False, nên có thể return trực tiếp mà không cần if."
+    }
   },
-
   {
     "id": "d01_fix_sum",
     "skill": "debugging",
@@ -232,8 +646,30 @@
     "title": "Sửa lỗi tính tổng",
     "description": "Đoạn code có lỗi. Sửa để nhập n và in tổng từ 1 đến n.",
     "starter_code": "n = int(input())\ns = 0\nfor i in range(1, n):\n    s = i\nprint(s)\n",
-    "tests": [{"input": "5\n", "output": "15"}, {"input": "1\n", "output": "1"}, {"input": "10\n", "output": "55"}],
-    "hints": ["Có hai lỗi logic: phạm vi lặp và cách cập nhật s.", "range phải đi tới n; s phải cộng dồn.", "Dùng range(1, n+1) và s += i."]
+    "tests": [
+      {
+        "input": "5\n",
+        "output": "15"
+      },
+      {
+        "input": "1\n",
+        "output": "1"
+      },
+      {
+        "input": "10\n",
+        "output": "55"
+      }
+    ],
+    "hints": [
+      "Có hai lỗi logic: phạm vi lặp và cách cập nhật s.",
+      "range phải đi tới n; s phải cộng dồn.",
+      "Dùng range(1, n+1) và s += i."
+    ],
+    "advanced_solution": {
+      "title": "Dùng sum() với range()",
+      "code": "n = int(input())\nprint(sum(range(1, n + 1)))",
+      "explanation": "Hai lỗi cũ là range(1, n) thiếu n và s = i ghi đè thay vì cộng dồn. Dùng sum(range(1, n + 1)) tránh được cả hai lỗi này."
+    }
   },
   {
     "id": "d02_fix_indent",
@@ -243,8 +679,30 @@
     "title": "Sửa lỗi thụt lề",
     "description": "Sửa code để in YES nếu n dương, ngược lại in NO.",
     "starter_code": "n = int(input())\nif n > 0:\nprint('YES')\nelse:\n print('NO')\n",
-    "tests": [{"input": "2\n", "output": "YES"}, {"input": "0\n", "output": "NO"}, {"input": "-1\n", "output": "NO"}],
-    "hints": ["Lệnh bên trong if và else phải thụt vào.", "Hai lệnh print nên cùng mức thụt lề 4 khoảng trắng.", "Không thụt dòng else; chỉ thụt nội dung của hai nhánh."]
+    "tests": [
+      {
+        "input": "2\n",
+        "output": "YES"
+      },
+      {
+        "input": "0\n",
+        "output": "NO"
+      },
+      {
+        "input": "-1\n",
+        "output": "NO"
+      }
+    ],
+    "hints": [
+      "Lệnh bên trong if và else phải thụt vào.",
+      "Hai lệnh print nên cùng mức thụt lề 4 khoảng trắng.",
+      "Không thụt dòng else; chỉ thụt nội dung của hai nhánh."
+    ],
+    "advanced_solution": {
+      "title": "Toán tử 3 ngôi, không cần khối thụt lề",
+      "code": "n = int(input())\nprint(\"YES\" if n > 0 else \"NO\")",
+      "explanation": "Khi mỗi nhánh chỉ in một giá trị, biểu thức điều kiện trên một dòng loại bỏ hoàn toàn nguy cơ sai thụt lề."
+    }
   },
   {
     "id": "d03_boundary",
@@ -254,8 +712,27 @@
     "title": "Sửa lỗi trường hợp biên",
     "description": "Sửa hàm max_value(a) để trả None khi list rỗng, còn lại trả giá trị lớn nhất.",
     "starter_code": "def max_value(a):\n    m = 0\n    for x in a:\n        if x > m:\n            m = x\n    return m\n",
-    "tests": [{"assert": "assert max_value([3, 1, 5]) == 5"}, {"assert": "assert max_value([-7, -2, -9]) == -2"}, {"assert": "assert max_value([]) is None"}],
-    "hints": ["Khởi tạo m=0 sai khi mọi số đều âm.", "Xử lý list rỗng trước rồi lấy phần tử đầu làm m.", "if not a: return None; sau đó m = a[0]."]
+    "tests": [
+      {
+        "assert": "assert max_value([3, 1, 5]) == 5"
+      },
+      {
+        "assert": "assert max_value([-7, -2, -9]) == -2"
+      },
+      {
+        "assert": "assert max_value([]) is None"
+      }
+    ],
+    "hints": [
+      "Khởi tạo m=0 sai khi mọi số đều âm.",
+      "Xử lý list rỗng trước rồi lấy phần tử đầu làm m.",
+      "if not a: return None; sau đó m = a[0]."
+    ],
+    "advanced_solution": {
+      "title": "Dùng max() kết hợp toán tử 3 ngôi",
+      "code": "def max_value(a):\n    return max(a) if a else None",
+      "explanation": "Danh sách rỗng được Python coi là False, nên if a nghĩa là 'a có phần tử'. Không cần khởi tạo m = 0, vốn là nguyên nhân gây sai với số âm."
+    }
   },
   {
     "id": "d04_binary_search",
@@ -265,7 +742,26 @@
     "title": "Hoàn thiện tìm kiếm nhị phân",
     "description": "Hoàn thiện binary_search(a, x) trên list tăng dần; trả chỉ số hoặc -1.",
     "starter_code": "def binary_search(a, x):\n    left, right = 0, len(a) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        # Hoàn thiện ba trường hợp\n    return -1\n",
-    "tests": [{"assert": "assert binary_search([1, 3, 5, 7], 5) == 2"}, {"assert": "assert binary_search([1, 3, 5, 7], 2) == -1"}, {"assert": "assert binary_search([], 1) == -1"}],
-    "hints": ["So sánh a[mid] với x.", "Nếu nhỏ hơn x, bỏ nửa trái; nếu lớn hơn, bỏ nửa phải.", "Cập nhật left = mid+1 hoặc right = mid-1; nếu bằng thì return mid."]
+    "tests": [
+      {
+        "assert": "assert binary_search([1, 3, 5, 7], 5) == 2"
+      },
+      {
+        "assert": "assert binary_search([1, 3, 5, 7], 2) == -1"
+      },
+      {
+        "assert": "assert binary_search([], 1) == -1"
+      }
+    ],
+    "hints": [
+      "So sánh a[mid] với x.",
+      "Nếu nhỏ hơn x, bỏ nửa trái; nếu lớn hơn, bỏ nửa phải.",
+      "Cập nhật left = mid+1 hoặc right = mid-1; nếu bằng thì return mid."
+    ],
+    "advanced_solution": {
+      "title": "Dùng mô-đun bisect của Python",
+      "code": "from bisect import bisect_left\n\ndef binary_search(a, x):\n    i = bisect_left(a, x)\n    return i if i < len(a) and a[i] == x else -1",
+      "explanation": "bisect_left tìm nhị phân vị trí có thể chèn x vào a. Nếu vị trí đó hợp lệ và a[i] == x thì đã tìm thấy. Tự cài đặt giúp hiểu thuật toán, còn dùng thư viện thì an toàn hơn."
+    }
   }
 ]

@@ -279,10 +279,14 @@ class AuthService:
             db.execute("UPDATE users SET password_hash=?,must_change_password=0,updated_at=? WHERE id=?", (self.passwords.hash(new_password), self._now(), user_id))
             self._audit(db, user_id, "change_password", "user", user_id)
 
-    def create_class(self, actor_id: int, name: str) -> dict[str, Any]:
-        teacher = self._require(actor_id, {"teacher"})
+    def create_class(self, actor_id: int, name: str, teacher_id: int | None = None) -> dict[str, Any]:
+        """Chỉ ADMIN được tạo lớp và phân công giáo viên phụ trách (teacher_id)."""
+        admin = self._require(actor_id, {"admin"})
         if not name.strip():
             raise ValidationError("Tên lớp không được để trống.")
+        teacher = self.get_user(teacher_id) if teacher_id else admin
+        if not teacher or not teacher.is_active or teacher.role not in {"teacher", "admin"}:
+            raise ValidationError("Giáo viên phụ trách phải tồn tại, đang hoạt động và có vai trò giáo viên.")
         code = secrets.token_hex(3).upper()
         with self._connect() as db:
             cur = db.execute("INSERT INTO classes(name,teacher_id,join_code,created_at) VALUES(?,?,?,?)", (name.strip(), teacher.id, code, self._now()))
@@ -290,14 +294,17 @@ class AuthService:
             self._audit(db, actor_id, "create_class", "class", class_id, {"name": name.strip()})
         return {"id": class_id, "name": name.strip(), "join_code": code}
 
-    def join_class(self, student_id: int, join_code: str) -> None:
-        self._require(student_id, {"student"})
+    def add_student_to_class(self, actor_id: int, class_id: int, student_id: int) -> None:
+        """Chỉ ADMIN được đưa học sinh vào lớp (học sinh không tự vào lớp bằng mã)."""
+        self._require(actor_id, {"admin"})
+        student = self.get_user(student_id)
+        if not student or student.role != "student":
+            raise ValidationError("Chỉ có thể thêm tài khoản học sinh vào lớp.")
         with self._connect() as db:
-            classroom = db.execute("SELECT id FROM classes WHERE join_code=?", (join_code.strip().upper(),)).fetchone()
-            if not classroom:
-                raise ValidationError("Mã lớp không tồn tại.")
-            db.execute("INSERT OR IGNORE INTO class_members(class_id,student_id,joined_at) VALUES(?,?,?)", (classroom["id"], student_id, self._now()))
-            self._audit(db, student_id, "join_class", "class", classroom["id"])
+            if not db.execute("SELECT 1 FROM classes WHERE id=?", (class_id,)).fetchone():
+                raise ValidationError("Không tìm thấy lớp.")
+            db.execute("INSERT OR IGNORE INTO class_members(class_id,student_id,joined_at) VALUES(?,?,?)", (class_id, student_id, self._now()))
+            self._audit(db, actor_id, "add_student_to_class", "class", class_id, {"student_id": student_id})
 
     def list_classes(self, actor_id: int) -> list[dict[str, Any]]:
         actor = self._require(actor_id, {"admin", "teacher", "student"})
